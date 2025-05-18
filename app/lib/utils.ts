@@ -34,7 +34,7 @@ export function extractIdFromSlug(url: string) {
   return +id;
 }
 
-export function Capitalize(value: string) {
-  if (!value) return;
+export function Capitalize(value: string | null) {
+  if (!value) return null;
   return value.charAt(0).toUpperCase() + value.slice(1);
 }

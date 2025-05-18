@@ -1,7 +1,7 @@
 import { SearchIcon } from "lucide-react";
 
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Input } from "app/components/ui/input";
+import { Button } from "app/components/ui/button";
 import { ListFilterIcon, XIcon } from "lucide-react";
 
 import {
@@ -11,10 +11,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Label } from "@/components/ui/label";
-import { Capitalize } from "@/lib/utils";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+} from "app/components/ui/dropdown-menu";
+import { Label } from "app/components/ui/label";
+import { Capitalize } from "app/lib/utils";
+import { useNavigate, useLocation, useSearchParams } from "react-router";
 import { useEffect, useState } from "react";
 
 const types = [
@@ -29,9 +29,9 @@ const filters = [
 ];
 
 export function SearchContent() {
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const { replace } = useRouter();
+  const [searchParams] = useSearchParams();
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
   const params = new URLSearchParams(searchParams);
 
   const [search, setSearch] = useState(params.get("q") || "");
@@ -45,7 +45,7 @@ export function SearchContent() {
     } else {
       params.delete("q");
     }
-    replace(`${pathname}?${params.toString()}`);
+    navigate(`${pathname}?${params.toString()}`);
   }
 
   function handleFilter(filter: string) {
@@ -55,7 +55,7 @@ export function SearchContent() {
       params.delete("filter");
     }
     params.delete("page");
-    replace(`${pathname}?${params.toString()}`);
+    navigate(`${pathname}?${params.toString()}`);
   }
 
   function handleType(type: string) {
@@ -65,20 +65,20 @@ export function SearchContent() {
       params.delete("type");
     }
     params.delete("page");
-    replace(`${pathname}?${params.toString()}`);
+    navigate(`${pathname}?${params.toString()}`);
   }
 
   function clearFilters() {
     params.delete("q");
     params.delete("filter");
     params.delete("type");
-    replace(`${pathname}?${params.toString()}`);
+    navigate(`${pathname}?${params.toString()}`);
     setSearch("");
   }
 
   function clearQueryFilter() {
     params.delete("q");
-    replace(`${pathname}?${params.toString()}`);
+    navigate(`${pathname}?${params.toString()}`);
     setSearch("");
   }
 
@@ -180,7 +180,7 @@ export function SearchContent() {
             <Button variant="outline" size="default" className="gap-1">
               <ListFilterIcon className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                {Capitalize(params.get("filter")) || "Filtrar por"}
+                {Capitalize(params.get("filter") || "") || "Filtrar por"}
               </span>
             </Button>
           </DropdownMenuTrigger>

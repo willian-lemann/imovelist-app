@@ -1,5 +1,3 @@
-"use client";
-
 import { XIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";

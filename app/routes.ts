@@ -8,7 +8,7 @@ import {
 
 export default [
   layout("routes/auth/protected.tsx", [
-    index("routes/home.tsx"),
+    index("routes/home/index.tsx"),
     route("/anunciar", "routes/publish.tsx"),
   ]),
 
