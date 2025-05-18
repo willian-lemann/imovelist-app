@@ -1,5 +1,7 @@
+import { getListings } from "~/api/listings/get-listings";
 import { Listings } from "~/components/listings";
 import { Search } from "~/components/search";
+import type { Route } from "./+types";
 
 export function meta({}) {
   return [
@@ -12,9 +14,28 @@ export function meta({}) {
   ];
 }
 
-async function loader() {}
+export async function loader({ request }: Route.LoaderArgs) {
+  const url = new URL(request.url);
+  const q = url.searchParams.get("q");
+  const page = url.searchParams.get("page");
+  const filter = url.searchParams.get("filter");
+  const type = url.searchParams.get("type");
+  const { data: listings, count } = await getListings({
+    search: q ?? undefined,
+    page: page ? parseInt(page) : 1,
+    limit: 12,
+    filter: filter ?? undefined,
+    type: type ?? undefined,
+  });
 
-export default function Home() {
+  return {
+    data: listings,
+    count,
+  };
+}
+
+export default function Home({ loaderData }: Route.ComponentProps) {
+  const { data: listings, count } = loaderData;
   return (
     <div>
       <header className="bg-background border-b py-4">
