@@ -1,0 +1,22 @@
+export type Listing = {
+  id: number;
+  created_at: string;
+  name: string;
+  link: string;
+  image: string;
+  address: string;
+  price: string;
+  area: string;
+  bedrooms: number;
+  type: string;
+  forSale: boolean;
+  parking: number;
+  content: string;
+  photos: string;
+  agency: string;
+  bathrooms: number;
+  ref: string;
+  placeholderImage: string;
+  agent_id: string | null;
+  published: boolean;
+};

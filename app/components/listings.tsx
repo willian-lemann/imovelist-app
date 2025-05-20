@@ -8,6 +8,7 @@ import { Label } from "../components/ui/label";
 import { Pagination } from "./ui/pagination";
 import { CustomPagination } from "./custom-pagination";
 import { useNavigate } from "react-router";
+import type { Listing } from "~/api/types";
 
 interface ListingsProps {
   listings: Listing[];
@@ -62,13 +63,9 @@ export function Listings({ listings, count }: ListingsProps) {
           </div>
         </div>
       ) : (
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 md:container gap-6">
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {listings.map((listing) => (
-            <ListingItem
-              key={listing.id}
-              listing={listing}
-              isLogged={isLogged}
-            />
+            <ListingItem key={listing.id} listing={listing} />
           ))}
         </div>
       )}

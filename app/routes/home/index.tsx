@@ -2,6 +2,7 @@ import { getListings } from "~/api/listings/get-listings";
 import { Listings } from "~/components/listings";
 import { Search } from "~/components/search";
 import type { Route } from "./+types";
+import type { Listing } from "~/api/types";
 
 export function meta({}) {
   return [
@@ -36,10 +37,11 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export default function Home({ loaderData }: Route.ComponentProps) {
   const { data: listings, count } = loaderData;
+
   return (
-    <div>
+    <div className="container px-0">
       <header className="bg-background border-b py-4">
-        <div className="container py-4 flex items-center justify-between">
+        <div className="py-4 flex items-center justify-between">
           <a href="/" className="flex items-center gap-2">
             <svg
               className="w-6 h-6"
@@ -76,7 +78,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         </div>
       </header>
 
-      <div className="container">
+      <div className="">
         <div className="py-4">
           <Search />
         </div>

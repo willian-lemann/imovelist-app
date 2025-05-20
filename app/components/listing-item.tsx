@@ -10,7 +10,23 @@ import { Link } from "react-router";
 
 import { PhotosCarousel } from "./photos-carousel";
 
-export function ListingItem({ listing }) {
+type ListingItemProps = {
+  listing: {
+    id: string;
+    address: string;
+    name: string;
+    type: string;
+    forSale: boolean;
+    bedrooms: number;
+    bathrooms: number;
+    area: number;
+    price: number;
+    isOnwer: boolean;
+    photos: string[];
+  };
+};
+
+export function ListingItem({ listing }: ListingItemProps) {
   function getListingURL(listingItem) {
     return `/imoveis/${listingItem.id}-${createSlug(listingItem.address)}`;
   }
@@ -33,22 +49,25 @@ export function ListingItem({ listing }) {
             </Badge>
           ) : null}
 
-          <PhotosCarousel photos={listing.photos} />
-        </div>
-
-        <div className="py-4 bg-background">
-          <div className="flex items-center justify-between mb-2">
-            <div className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-muted text-muted-foreground">
-              {listing.type}
-            </div>
-            <div className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-primary text-primary-foreground">
+          <div className="relative">
+            <PhotosCarousel photos={listing.photos} />
+            <div className="absolute top-3 left-3 z-50 inline-block px-4 py-1 text-xs font-medium rounded-full bg-primary-foreground/90  text-primary">
               {listing.forSale ? "Venda" : "Aluguel"}
             </div>
           </div>
-          <h3 className="text-base font-semibold mb-2 text-muted-foreground">
-            {listing.name || listing.address}
-          </h3>
-          <div className="flex items-center text-sm text-muted-foreground mb-4">
+        </div>
+
+        <div className="py-2 bg-background">
+          <div className="flex mb-2 items-center justify-between">
+            <h3 className="font-semibold text-muted-foreground">
+              {listing.name || listing.address}
+            </h3>
+
+            <div className="px-3 py-1 text-xs font-medium rounded-full bg-muted text-muted-foreground">
+              {listing.type}
+            </div>
+          </div>
+          <div className="flex items-center text-muted-foreground mb-3">
             <BedIcon className="w-4 h-4 mr-0.5" />
             {listing.bedrooms}
             <Separator orientation="vertical" className="mx-2" />
@@ -63,7 +82,9 @@ export function ListingItem({ listing }) {
             ) : null}
           </div>
           <div className="flex items-center justify-between">
-            <div className="text-2xl font-bold">R$ {listing.price}</div>
+            <div className="text-base font-sans font-bold text-primary">
+              R$ {listing.price}
+            </div>
 
             {listing.isOnwer ? (
               <Button

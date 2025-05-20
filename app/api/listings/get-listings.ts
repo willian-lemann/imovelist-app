@@ -1,4 +1,5 @@
 import { db } from "../database";
+import type { Listing } from "../types";
 
 export async function getListings({
   page = 1,
@@ -27,13 +28,11 @@ export async function getListings({
     query.eq("type", type);
   }
 
-  console.log(await query);
-
   const { data, error, count } = await query;
 
   return {
-    data,
+    data: data as Listing[],
     error,
-    count,
+    count: count || 0,
   };
 }
