@@ -21,7 +21,7 @@ export default function SignIn() {
           navigate("/");
         },
         onError: (ctx) => {
-          alert(ctx.error);
+          alert(JSON.stringify(ctx.error));
         },
       }
     );

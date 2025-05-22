@@ -3,6 +3,8 @@ import { Listings } from "./listings";
 import { Search } from "~/components/search";
 import type { Route } from "./+types";
 import type { Listing } from "~/api/types";
+import { authClient } from "~/lib/auth-client";
+import { useNavigate } from "react-router";
 
 export function meta({}) {
   return [
@@ -38,6 +40,8 @@ export async function loader({ request }: Route.LoaderArgs) {
 export default function Home({ loaderData }: Route.ComponentProps) {
   const { data: listings, count } = loaderData;
 
+  const navigate = useNavigate();
+
   return (
     <div className="container px-0">
       <header className="bg-background border-b py-4">
@@ -64,6 +68,19 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             {/* <LoginModal>
                 <Button variant="outline">Login</Button>
               </LoginModal> */}
+            <button
+              onClick={async () => {
+                await authClient.signOut({
+                  fetchOptions: {
+                    onSuccess: () => {
+                      navigate("/login");
+                    },
+                  },
+                });
+              }}
+            >
+              singou
+            </button>
 
             {/* <a href="/announce" className="btn">
                 Anunciar
