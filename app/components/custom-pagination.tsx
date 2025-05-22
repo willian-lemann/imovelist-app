@@ -9,13 +9,24 @@ import {
   PaginationEllipsis,
 } from "~/components/ui/pagination";
 
+type CustomPaginationProps = {
+  totalPages: number;
+  currentPage: number;
+  onPageChange: (page: number) => void;
+  maxPageToShow: number;
+  startPage?: number;
+  endPage?: number;
+};
+
 export function CustomPagination({
   totalPages,
   currentPage,
   onPageChange,
   maxPageToShow,
-}) {
-  const handlePageChange = (page) => {
+  startPage,
+  endPage,
+}: CustomPaginationProps) {
+  const handlePageChange = (page: number) => {
     if (onPageChange) {
       onPageChange(page);
     }

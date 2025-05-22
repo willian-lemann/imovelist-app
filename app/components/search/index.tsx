@@ -33,7 +33,7 @@ export function Search() {
     return (
       <div
         data-floating={isFloating}
-        className="-translate-y-[200px] md:-translate-y-[100px] data-[floating=true]:-translate-y-0 fixed z-[9999] flex transition-all duration-200 md:max-w-4xl top-0  shadow-md md:top-2 left-1/2 -translate-x-1/2 py-6 md:rounded-3xl  md:mx-auto md:flex-row flex-col md:items-center justify-end px-4 md:container w-full gap-2 bg-background"
+        className="-translate-y-[200px]  md:-translate-y-[100px] data-[floating=true]:-translate-y-0 fixed z-[9999] flex transition-all duration-200 md:max-w-4xl top-0  shadow-md md:top-2 left-1/2 -translate-x-1/2 py-6 md:rounded-3xl  md:mx-auto md:flex-row flex-col md:items-center justify-end px-4 md:container w-full gap-2 bg-white"
       >
         <SearchContent />
       </div>

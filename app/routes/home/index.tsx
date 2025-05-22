@@ -1,5 +1,5 @@
 import { getListings } from "~/api/listings/get-listings";
-import { Listings } from "~/components/listings";
+import { Listings } from "./listings";
 import { Search } from "~/components/search";
 import type { Route } from "./+types";
 import type { Listing } from "~/api/types";

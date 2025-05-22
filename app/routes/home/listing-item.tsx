@@ -1,14 +1,14 @@
 import { BathIcon, BedIcon, RulerIcon } from "lucide-react";
-import { Separator } from "../components/ui/separator";
-import { Card } from "../components/ui/card";
-import { createSlug } from "../lib/utils";
+import { Separator } from "~/components/ui/separator";
+import { Card } from "~/components/ui/card";
+import { createSlug } from "~/lib/utils";
 
-import { Label } from "../components/ui/label";
-import { Badge } from "../components/ui/badge";
-import { Button } from "./ui/button";
+import { Label } from "~/components/ui/label";
+import { Badge } from "~/components/ui/badge";
+
 import { Link } from "react-router";
 
-import { PhotosCarousel } from "./photos-carousel";
+import { PhotosCarousel } from "~/components/photos-carousel";
 
 type ListingItemProps = {
   listing: {

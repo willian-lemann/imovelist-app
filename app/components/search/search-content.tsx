@@ -147,7 +147,7 @@ export function SearchContent() {
                 </span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="bg-white">
               <DropdownMenuLabel> Tipo de imóvel</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {types.map((type) => (

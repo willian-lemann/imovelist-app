@@ -2,13 +2,12 @@ import { useState } from "react";
 import { ListingItem } from "./listing-item";
 import { List } from "lucide-react";
 
-import { ScrollToTopButton } from "../components/scroll-top-button";
-import { Label } from "../components/ui/label";
+import { ScrollToTopButton } from "~/components/scroll-top-button";
+import { Label } from "~/components/ui/label";
 
-import { Pagination } from "./ui/pagination";
-import { CustomPagination } from "./custom-pagination";
 import { useNavigate } from "react-router";
 import type { Listing } from "~/api/types";
+import { CustomPagination } from "~/components/custom-pagination";
 
 interface ListingsProps {
   listings: Listing[];
@@ -71,14 +70,16 @@ export function Listings({ listings, count }: ListingsProps) {
       )}
 
       {shouldShowPagination && (
-        <CustomPagination
-          currentPage={currentPage}
-          onPageChange={handlePageChange}
-          totalPages={numberOfPages}
-          startPage={startPage}
-          endPage={endPage}
-          maxPageToShow={maxPagesToShow}
-        />
+        <div className="py-10">
+          <CustomPagination
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+            totalPages={numberOfPages}
+            startPage={startPage}
+            endPage={endPage}
+            maxPageToShow={maxPagesToShow}
+          />
+        </div>
       )}
 
       <ScrollToTopButton />
