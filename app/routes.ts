@@ -7,8 +7,9 @@ import {
 } from "@react-router/dev/routes";
 
 export default [
+  index("routes/home/index.tsx"),
+
   layout("routes/auth/protected.tsx", [
-    index("routes/home/index.tsx"),
     route("/anunciar", "routes/publish.tsx"),
   ]),
 

@@ -68,7 +68,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             {/* <LoginModal>
                 <Button variant="outline">Login</Button>
               </LoginModal> */}
-            <button
+            {/* <button
               onClick={async () => {
                 await authClient.signOut({
                   fetchOptions: {
@@ -80,7 +80,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
               }}
             >
               singou
-            </button>
+            </button> */}
 
             {/* <a href="/announce" className="btn">
                 Anunciar

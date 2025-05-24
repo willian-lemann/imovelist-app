@@ -1,4 +1,4 @@
-import { SearchIcon } from "lucide-react";
+import { SearchIcon, SlidersHorizontal } from "lucide-react";
 
 import { Input } from "app/components/ui/input";
 import { Button } from "app/components/ui/button";
@@ -13,9 +13,18 @@ import {
   DropdownMenuTrigger,
 } from "app/components/ui/dropdown-menu";
 import { Label } from "app/components/ui/label";
-import { Capitalize } from "app/lib/utils";
+
 import { useNavigate, useLocation, useSearchParams } from "react-router";
 import { useEffect, useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { RangeFilter } from "../range-filter";
+import { Capitalize } from "~/lib/utils";
 
 const types = [
   { label: "Apartamento", value: "apartamento" },
@@ -23,7 +32,7 @@ const types = [
   { label: "Residencial", value: "residencial" },
 ];
 
-const filters = [
+const filtersPropertyType = [
   { label: "Aluguel", value: "aluguel" },
   { label: "Venda", value: "venda" },
 ];
@@ -35,6 +44,28 @@ export function SearchContent() {
   const params = new URLSearchParams(searchParams);
 
   const [search, setSearch] = useState(params.get("q") || "");
+
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000000]);
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
+  const [filters, setFilters] = useState({
+    propertyType: "",
+    bedrooms: "",
+    bathrooms: "",
+    parking: "",
+    minPrice: "",
+    maxPrice: "",
+    minArea: "",
+    maxArea: "",
+  });
 
   const hasFilters =
     params.has("filter") || params.has("type") || params.has("q");
@@ -126,7 +157,7 @@ export function SearchContent() {
               <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
               <DropdownMenuSeparator />
 
-              {filters.map((filter) => (
+              {filtersPropertyType.map((filter) => (
                 <DropdownMenuCheckboxItem
                   checked={params.get("filter") === filter.value}
                   key={filter.value}
@@ -180,23 +211,125 @@ export function SearchContent() {
             <Button variant="outline" size="default" className="gap-1">
               <ListFilterIcon className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                {Capitalize(params.get("filter") || "") || "Filtrar por"}
+                {Capitalize(params.get("filter") || "") || "Filtros avançados"}
               </span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="">
-            <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
+          <DropdownMenuContent align="end" className="px-4 max-w-md min-w-md">
+            <DropdownMenuLabel className="px-0">Filtros</DropdownMenuLabel>
             <DropdownMenuSeparator />
 
-            {filters.map((filter) => (
-              <DropdownMenuCheckboxItem
-                checked={params.get("filter") === filter.value}
-                key={filter.value}
-                onClick={() => handleFilter(filter.value)}
-              >
-                {filter.label}
-              </DropdownMenuCheckboxItem>
-            ))}
+            <div className="space-y-2 pb-10">
+              {/* Price Range */}
+              <div className="px-0">
+                <RangeFilter
+                  title="Preço"
+                  min={0}
+                  max={5000000}
+                  step={10000}
+                  defaultValue={[100000, 2000000]}
+                  formatValue={formatCurrency}
+                  onChange={setPriceRange}
+                />
+              </div>
+
+              <DropdownMenuSeparator />
+
+              <div className="px-0">
+                <RangeFilter
+                  title="Area (m²)"
+                  min={0}
+                  max={5000000}
+                  step={10000}
+                  defaultValue={[100000, 2000000]}
+                  formatValue={formatCurrency}
+                  onChange={setPriceRange}
+                />
+              </div>
+
+              <DropdownMenuSeparator />
+
+              <div className="flex space-x-4">
+                <div className="flex-1">
+                  <DropdownMenuLabel className="px-0">
+                    Quartos
+                  </DropdownMenuLabel>
+                  <Select
+                    value={filters.bedrooms}
+                    onValueChange={(value) =>
+                      setFilters({ ...filters, bedrooms: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 quarto</SelectItem>
+                      <SelectItem value="2">2 quartos</SelectItem>
+                      <SelectItem value="3">3 quartos</SelectItem>
+                      <SelectItem value="4">4 quartos</SelectItem>
+                      <SelectItem value="5">5+ quartos</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Bathrooms */}
+                <div className="flex-1">
+                  <DropdownMenuLabel className="px-0">
+                    Banheiros
+                  </DropdownMenuLabel>
+                  <Select
+                    value={filters.bathrooms}
+                    onValueChange={(value) =>
+                      setFilters({ ...filters, bathrooms: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 banheiro</SelectItem>
+                      <SelectItem value="2">2 banheiros</SelectItem>
+                      <SelectItem value="3">3 banheiros</SelectItem>
+                      <SelectItem value="4">4+ banheiros</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Parking */}
+                <div className="flex-1">
+                  <DropdownMenuLabel className="px-0">
+                    Garagem
+                  </DropdownMenuLabel>
+                  <Select
+                    value={filters.parking}
+                    onValueChange={(value) =>
+                      setFilters({ ...filters, parking: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 vaga</SelectItem>
+                      <SelectItem value="2">2 vagas</SelectItem>
+                      <SelectItem value="3">3 vagas</SelectItem>
+                      <SelectItem value="4">4+ vagas</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  {filtersPropertyType.map((filter) => (
+                    <DropdownMenuCheckboxItem
+                      checked={params.get("filter") === filter.value}
+                      key={filter.value}
+                      onClick={() => handleFilter(filter.value)}
+                    >
+                      {filter.label}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                </div>
+              </div>
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
 
