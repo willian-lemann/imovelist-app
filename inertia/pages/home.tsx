@@ -17,12 +17,12 @@ export default function Home({ listings = [], currentUser, filters = {}, count }
       <Head title="Imovelist - Encontre facilmente seu imóvel dos sonhos" />
 
       <div className="px-0">
-        <div className="container">
+        <div>
           <Header currentUser={currentUser} />
         </div>
 
-        <div className=" px-0">
-          <div className="md:container py-4 md:px-0 px-4">
+        <div className="mx-auto max-w-[1350px]">
+          <div className="py-4 md:px-0 px-4">
             <Search />
           </div>
 
@@ -33,7 +33,7 @@ export default function Home({ listings = [], currentUser, filters = {}, count }
             <QuickFilters filters={filters} />
           </div>
 
-          <div className="mt-0 flex items-center justify-center md:px-0 px-4 data-[loading=true]:opacity-50 data-[loading=true]:pointer-events-none transition-all duration-200">
+          <div className="w-full  mt-0  md:px-0 px-4 data-[loading=true]:opacity-50 data-[loading=true]:pointer-events-none transition-all duration-200">
             <Listings listings={listings} count={count} />
           </div>
         </div>

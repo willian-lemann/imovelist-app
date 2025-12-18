@@ -111,6 +111,7 @@ button {
 @layer utilities {
    .container {
       @apply mx-auto;
+      @apply px-0;
    }
 }
 

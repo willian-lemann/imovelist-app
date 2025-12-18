@@ -11,7 +11,7 @@ type HeaderProps = {
 export function Header({ currentUser }: HeaderProps = {}) {
   return (
     <header className="bg-background shadow-xs py-0">
-      <div className="container py-4 flex items-center justify-between px-4 md:px-0">
+      <div className="mx-auto max-w-[1350px] py-4 flex items-center justify-between px-4 md:px-0">
         <Logo />
 
         <div className="flex items-center gap-4">
