@@ -1,9 +1,8 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { ListingItem } from './listing-item'
 import { List } from 'lucide-react'
 
 import { ScrollToTopButton } from '~/components/scroll-top-button'
-import { Label } from '~/components/ui/label'
 
 import { CustomPagination } from '~/components/custom-pagination'
 import { isMobile } from '~/helpers/mobile'
@@ -22,22 +21,23 @@ export function Listings({ listings, count }: ListingsProps) {
   const initialPage = pageMatch ? Number(pageMatch[1]) : 1
   const [currentPage, setCurrentPage] = useState(initialPage)
 
-  const pageSize = 12
+  const pageSize = 21
 
   const numberOfPages = Math.ceil(Number(count) / pageSize)
 
   const maxPagesToShow = isMobile() ? 5 : 10
-  const shouldShowPagination = count > 0
+  const shouldShowPagination = listings.length > 0
   const isUserOnMobile = isMobile()
 
   // Group listings into chunks of 7 for mobile horizontal scrolling
-  const chunkListings = (items: Listing[], size: number) => {
+  const chunkListings = useCallback((items: Listing[], size: number) => {
     const chunks: Listing[][] = []
     for (let i = 0; i < items.length; i += size) {
       chunks.push(items.slice(i, i + size))
     }
+
     return chunks
-  }
+  }, [])
 
   const listingGroups = isUserOnMobile ? chunkListings(listings, 7) : [listings]
 

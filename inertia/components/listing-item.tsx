@@ -1,16 +1,14 @@
-import { BathIcon, BedIcon, RulerIcon } from 'lucide-react'
-
 import { Card } from '~/components/ui/card'
 import { formatMoney, createSlug } from '../lib/utils'
 
 import { Label } from '~/components/ui/label'
 import { Badge } from '~/components/ui/badge'
 
-import { PhotosCarousel } from '~/components/photos-carousel'
 import { Button } from '~/components/ui/button'
 
 import React, { useCallback } from 'react'
 import Listing from '#models/listing'
+import { PhotoCarouselItem } from './photo-carousel-item'
 
 type ListingItemProps = {
   listing: Listing
@@ -25,17 +23,17 @@ export function ListingItem({ listing }: ListingItemProps) {
     [listing]
   )
 
-  const detailsUrl = getListingURL(listing)
+  // const detailsUrl = getListingURL(listing)
 
   function handleGoDetails(listing: Listing) {
     window.open(getListingURL(listing), '_blank')
   }
 
-  const isOwner = listing.agentId
+  const isOwner = listing.agent_id
   const name = listing.name || listing.address?.split(',')[0]
 
   return (
-    <React.Fragment key={listing.id}>
+    <React.Fragment>
       <Card
         onMouseDown={(e) => {
           const element = e.target as HTMLElement
@@ -60,7 +58,13 @@ export function ListingItem({ listing }: ListingItemProps) {
           ) : null}
 
           <div className="relative">
-            <PhotosCarousel photos={listing.photos} />
+            <div className="w-36 md:w-auto h-32 md:h-[180px] brightness-100 transition-all duration-300 md:rounded-lg overflow-hidden">
+              <PhotoCarouselItem
+                href={listing.photos[0]}
+                blurImage={listing.photos[0]}
+                isFirst={true}
+              />
+            </div>
 
             <div className="absolute top-3 left-3 z-40 inline-block px-4 py-1 text-xs font-medium rounded-full bg-primary-foreground/90  text-primary">
               {listing.forSale ? 'Venda' : 'Aluguel'}

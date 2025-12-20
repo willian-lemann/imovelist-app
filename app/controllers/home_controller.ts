@@ -2,7 +2,9 @@ import Listing from '#models/listing'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class HomeController {
-  public async index({ inertia, request }: HttpContext) {
+  public async index({ inertia, request, auth }: HttpContext) {
+    const currentUser = auth.getUserOrFail()
+
     const page = request.input('page', 1)
     const limit = 21
 
@@ -91,6 +93,8 @@ export default class HomeController {
       }),
       filters: request.qs(),
       count: Number(total),
+      isAuthenticated: auth.isAuthenticated,
+      currentUser: currentUser.serialize(),
     })
   }
 }

@@ -1,7 +1,7 @@
 import { SearchIcon } from 'lucide-react'
 import { Input } from '~/components/ui/input'
 import { router } from '@inertiajs/react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useRef } from 'react'
 import { useDebounce } from '~/hooks/use-debounce'
 import { isMobile } from '~/helpers/mobile'
 import { DropdownType } from './dropdown-type'
@@ -23,7 +23,8 @@ export function SearchContent({
 }: SearchContentProps) {
   const [filters, setFilters] = useState(initialFilters)
   const [searchValue, setSearchValue] = useState(q || '')
-  const debouncedSearchValue = useDebounce(searchValue, 300)
+  const debouncedSearchValue = useDebounce(searchValue, 500)
+  const isInitialMount = useRef(true)
 
   const handleSetFilters = useCallback((newFilters: Partial<typeof filters>) => {
     setFilters((prev) => ({
@@ -32,37 +33,67 @@ export function SearchContent({
     }))
   }, [])
 
+  const navigateWithFilters = useCallback((params: URLSearchParams) => {
+    router.visit(`${window.location.pathname}?${params.toString()}`, {
+      preserveState: true,
+      preserveScroll: true,
+      replace: true, // Don't pollute browser history
+      only: ['listings', 'count', 'filters'], // Only reload these props
+    })
+  }, [])
+
   const buildSearchParams = useCallback(() => {
-    const url = new URL(window.location.href)
-    const params = new URLSearchParams(url.search)
+    const params = new URLSearchParams(window.location.search)
+
+    // Clear page when filters change
+    params.delete('page')
 
     if (filters.bedrooms.length > 0) {
       params.set('bedrooms', filters.bedrooms)
+    } else {
+      params.delete('bedrooms')
     }
+
     if (filters.bathrooms.length > 0) {
       params.set('bathrooms', filters.bathrooms)
+    } else {
+      params.delete('bathrooms')
     }
+
     if (filters.parking.length > 0) {
       params.set('parking', filters.parking)
+    } else {
+      params.delete('parking')
     }
+
     if (currentPropertyType) {
       params.set('property_type', currentPropertyType)
     }
+
     if (currentFilter) {
       params.set('filter', currentFilter)
     }
+
     if (
       filters.priceRange.length > 0 &&
       filters.priceRange[0] !== 0 &&
       filters.priceRange[1] !== 0
     ) {
       params.set('price_range', filters.priceRange.join(','))
+    } else {
+      params.delete('price_range')
     }
+
     if (filters.areaRange.length > 0 && filters.areaRange[0] !== 0 && filters.areaRange[1] !== 0) {
       params.set('area_range', filters.areaRange.join(','))
+    } else {
+      params.delete('area_range')
     }
+
     if (debouncedSearchValue.trim() !== '') {
       params.set('q', debouncedSearchValue)
+    } else {
+      params.delete('q')
     }
 
     return params
@@ -70,81 +101,82 @@ export function SearchContent({
 
   const handleApplyFilters = useCallback(() => {
     const params = buildSearchParams()
-    router.visit(`${window.location.pathname}?${params.toString()}`, {
+    navigateWithFilters(params)
+  }, [buildSearchParams, navigateWithFilters])
+
+  const handleFilter = useCallback(
+    (filter: string) => {
+      const params = new URLSearchParams(window.location.search)
+      params.delete('page')
+
+      if (filter !== currentFilter) {
+        params.set('filter', filter)
+      } else {
+        params.delete('filter')
+      }
+
+      navigateWithFilters(params)
+    },
+    [currentFilter, navigateWithFilters]
+  )
+
+  const handleType = useCallback(
+    (type: string) => {
+      const params = new URLSearchParams(window.location.search)
+      params.delete('page')
+
+      if (type !== currentPropertyType) {
+        params.set('property_type', type)
+      } else {
+        params.delete('property_type')
+      }
+
+      navigateWithFilters(params)
+    },
+    [currentPropertyType, navigateWithFilters]
+  )
+
+  const clearFilters = useCallback(() => {
+    router.visit(window.location.pathname, {
       preserveState: true,
+      replace: true,
+      only: ['listings', 'count', 'filters'],
     })
-  }, [buildSearchParams])
-
-  function handleFilter(filter: string) {
-    const url = new URL(window.location.href)
-    const params = new URLSearchParams(url.search)
-
-    if (filter !== currentFilter) {
-      params.set('filter', filter)
-      params.set('page', '1')
-    } else {
-      params.delete('filter')
-    }
-
-    router.visit(`${window.location.pathname}?${params.toString()}`, {
-      preserveState: true,
-    })
-  }
-
-  function handleType(type: string) {
-    const url = new URL(window.location.href)
-    const params = new URLSearchParams(url.search)
-
-    if (type !== currentPropertyType) {
-      params.set('property_type', type)
-      params.set('page', '1')
-    } else {
-      params.delete('property_type')
-    }
-
-    router.visit(`${window.location.pathname}?${params.toString()}`, {
-      preserveState: true,
-    })
-  }
-
-  function clearFilters() {
-    router.visit(window.location.pathname, { preserveState: true })
     setFilters(initialFilters)
     setSearchValue('')
-  }
+  }, [])
 
-  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+  const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     setSearchValue(value)
-  }
+  }, [])
 
+  // Sync URL search param with local state
   useEffect(() => {
     if (!q) {
       setSearchValue('')
     }
   }, [q])
 
+  // Handle debounced search navigation
   useEffect(() => {
-    if (debouncedSearchValue.trim() === '') {
-      const url = new URL(window.location.href)
-      const params = new URLSearchParams(url.search)
-      params.delete('q')
-      router.visit(`${window.location.pathname}?${params.toString()}`, {
-        preserveState: true,
-        preserveScroll: true,
-      })
+    // Skip on initial mount to avoid unnecessary request
+    if (isInitialMount.current) {
+      isInitialMount.current = false
       return
     }
 
-    const url = new URL(window.location.href)
-    const params = new URLSearchParams(url.search)
-    params.set('q', debouncedSearchValue)
+    const params = new URLSearchParams(window.location.search)
+    params.delete('page') // Reset to page 1 on search
 
-    router.visit(`${window.location.pathname}?${params.toString()}`, {
-      preserveState: true,
-      preserveScroll: true,
-    })
-  }, [debouncedSearchValue])
+    if (debouncedSearchValue.trim() === '') {
+      params.delete('q')
+    } else {
+      params.set('q', debouncedSearchValue)
+    }
+
+    navigateWithFilters(params)
+  }, [debouncedSearchValue, navigateWithFilters])
 
   return (
     <div className="flex flex-1/2">

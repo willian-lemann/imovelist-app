@@ -3,6 +3,7 @@ import { Link } from '@inertiajs/react'
 
 import { Logo } from './logo'
 import { LoginModal } from './login-modal'
+import { LogOut } from 'lucide-react'
 
 type HeaderProps = {
   currentUser?: any
@@ -15,25 +16,16 @@ export function Header({ currentUser }: HeaderProps = {}) {
         <Logo />
 
         <div className="flex items-center gap-4">
-          {/* {currentUser ? (
-            <Button type="button" variant="outline">
-              <Link to="/dashboard">Minha area</Link>
-            </Button>
+          {currentUser ? (
+            <Link href="/logout" method="post" className="flex items-center gap-2">
+              Sair
+              <LogOut className="h-4 w-4" />
+            </Link>
           ) : (
             <LoginModal>
               <Button variant="outline">Entrar</Button>
             </LoginModal>
-          )} */}
-
-          {/* <a href="/announce" className="btn">
-                Anunciar
-              </a> */}
-
-          {/* <Button variant="outline">Login</Button> */}
-
-          {/* <a href="/login" className="btn">
-                Sou corretor
-              </a> */}
+          )}
         </div>
       </div>
     </header>

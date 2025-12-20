@@ -104,8 +104,8 @@ export async function auxiliadoraPredialScrape() {
 
   logger.info(`Scraping completed. Processed ${allListings.length} listings.`)
 
-  await ScrappedListing.updateOrCreateMany('id', allListings)
-  await Listing.updateOrCreateMany('id', allListings)
+  await ScrappedListing.updateOrCreateMany('ref', allListings)
+  await Listing.updateOrCreateMany('ref', allListings)
 }
 
 async function scrapeCurrentPage(page: Page, baseUrl: string): Promise<ScrapedListing[]> {
@@ -208,13 +208,11 @@ async function scrapeCurrentPage(page: Page, baseUrl: string): Promise<ScrapedLi
 
         await detailPage.goto(fullLink, { waitUntil: 'load' })
 
-        detailPage.setDefaultTimeout(2000)
-
         // Extract description content
         const descriptionEl = detailPage.locator(
           'section.section-sobre-detalhe #descricao div.half-text-hidden'
         )
-        content = await descriptionEl.textContent().catch(() => {
+        content = await descriptionEl.innerText().catch(() => {
           console.log('Content fails to load')
           return null
         })
@@ -223,17 +221,22 @@ async function scrapeCurrentPage(page: Page, baseUrl: string): Promise<ScrapedLi
         }
 
         // Extract all photo URLs from the modal
-        const photoElements = detailPage.locator('dialog.mosaico-container li.item-mosaico img')
-        const photoCount = await photoElements.count()
+        const photoElements = await detailPage.$$eval(
+          'dialog.mosaico-container li.item-mosaico img',
+          (els) => els.map((el) => el.getAttribute('src'))
+        )
+
+        const photoCount = photoElements.length
 
         for (let j = 0; j < photoCount; j++) {
-          const photoSrc = await photoElements.nth(j).getAttribute('src')
+          const photoSrc = photoElements[j]
+
           if (photoSrc) {
             photos.push(photoSrc)
           }
         }
 
-        await detailPage.close()
+        await detailPage.close({ reason: 'normal' })
       } catch (err) {
         logger.error(`Error scraping detail page ${fullLink}:`, err)
       }

@@ -33,6 +33,12 @@ export function CustomPagination({
     }
   }
 
+  const handlePrefetch = (page: number) => {
+    const url = new URL(window.location.href)
+    url.searchParams.set('page', String(page))
+    router.prefetch(url.pathname + url.search)
+  }
+
   const renderPageNumbers = () => {
     const startPage = Math.max(1, currentPage - Math.floor(maxPageToShow / 2))
     const endPage = Math.min(totalPages, startPage + maxPageToShow - 1)
@@ -41,7 +47,13 @@ export function CustomPagination({
     for (let i = startPage; i <= endPage; i++) {
       pages.push(
         <PaginationItem key={i}>
-          <PaginationLink isActive={i === currentPage} onMouseDown={() => handlePageChange(i)}>
+          <PaginationLink
+            isActive={i === currentPage}
+            onMouseDown={() => {
+              handlePrefetch(i)
+              handlePageChange(i)
+            }}
+          >
             {i}
           </PaginationLink>
         </PaginationItem>

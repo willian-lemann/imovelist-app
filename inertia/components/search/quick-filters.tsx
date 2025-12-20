@@ -14,7 +14,6 @@ type QuickFiltersProps = {
 }
 
 export function QuickFilters({ filters = {} }: QuickFiltersProps) {
-  console.log(filters)
   const searchParams = new URLSearchParams(filters)
   const [quickFilters, setQuickFilters] = useState<{
     [key: string]: QuickFilter

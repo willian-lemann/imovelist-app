@@ -60,7 +60,7 @@ export default class Listing extends BaseModel {
   declare placeholderImage: string | null
 
   @column()
-  declare agentId: string | null
+  declare agent_id: string | null
 
   @column()
   declare published: boolean
