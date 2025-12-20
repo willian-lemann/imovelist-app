@@ -4,7 +4,7 @@ const HomeController = () => import('#controllers/home_controller')
 const ListingsController = () => import('#controllers/listings_controller')
 const SessionController = () => import('#controllers/session_controller')
 
-router.get('/', [HomeController, 'index']).use(middleware.auth())
+router.get('/', [HomeController, 'index'])
 
 router
   .group(() => {
