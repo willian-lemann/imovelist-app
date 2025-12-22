@@ -1,33 +1,30 @@
-import { useEffect, useState } from "react";
-import { SearchContent } from "./search-content";
+import { useEffect, useState } from 'react'
+import { SearchContent } from './search-content'
 
 export function Search() {
-  const [isFloating, setIsFloating] = useState(false);
+  const [isFloating, setIsFloating] = useState(false)
 
   useEffect(() => {
     function handleScroll() {
-      const scrollPosition =
-        window.scrollY || document.documentElement.scrollTop;
-      const windowHeight =
-        window.innerHeight || document.documentElement.clientHeight;
-      const documentHeight = document.documentElement.scrollHeight;
+      const scrollPosition = window.scrollY || document.documentElement.scrollTop
+      const windowHeight = window.innerHeight || document.documentElement.clientHeight
+      const documentHeight = document.documentElement.scrollHeight
 
-      const scrollPercentage =
-        (scrollPosition / (documentHeight - windowHeight)) * 100;
+      const scrollPercentage = (scrollPosition / (documentHeight - windowHeight)) * 100
 
       if (scrollPercentage >= 12) {
-        setIsFloating(true);
+        setIsFloating(true)
       } else {
-        setIsFloating(false);
+        setIsFloating(false)
       }
     }
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll)
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
 
   function renderFloatingSearch() {
     return (
@@ -37,15 +34,15 @@ export function Search() {
       >
         <SearchContent />
       </div>
-    );
+    )
   }
 
   return (
     <>
       {renderFloatingSearch()}
-      <div className="transition-all flex md:flex-row flex-col md:items-center justify-end px-0 md:container w-full gap-2 bg-background rounded-lg ">
+      <div className="transition-all flex md:flex-row flex-col md:items-center justify-end px-0  w-full max-w-full gap-2 bg-background rounded-lg ">
         <SearchContent />
       </div>
     </>
-  );
+  )
 }

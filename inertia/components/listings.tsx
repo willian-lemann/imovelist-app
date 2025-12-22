@@ -41,16 +41,6 @@ export function Listings({ listings, count }: ListingsProps) {
   const shouldShowPagination = true
   const isUserOnMobile = isMobile()
 
-  // Group listings into chunks of 7 for mobile horizontal scrolling
-  const chunkListings = useCallback((items: Listing[], size: number) => {
-    const chunks: Listing[][] = []
-    for (let i = 0; i < items.length; i += size) {
-      chunks.push(items.slice(i, i + size))
-    }
-
-    return chunks
-  }, [])
-
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
   }
@@ -72,35 +62,7 @@ export function Listings({ listings, count }: ListingsProps) {
           </div>
         </div>
       ) : isUserOnMobile ? (
-        <div className="mt-4 space-y-4">
-          {Object.entries(listings).map(([type, group]) => (
-            <div key={type}>
-              <div className="mb-2 flex items-center justify-between">
-                <h3 className="text-lg font-semibold capitalize">{type}</h3>
-                <Link
-                  href={`/?propertyType=${type}`}
-                  className="text-sm font-medium text-primary hover:underline"
-                >
-                  Ver mais
-                </Link>
-              </div>
-              {chunkListings(group, 7).map((chunk, chunkIndex) => (
-                <div key={chunkIndex} className="overflow-x-auto scrollbar-hide">
-                  <div
-                    className="flex items-center gap-3 pb-4 md:pb-2 max-w-[300px]"
-                    style={{ width: 'max-content' }}
-                  >
-                    {chunk.map((listing) => (
-                      <div key={listing.id} className="shrink-0">
-                        <ListingItem listing={listing} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
+        renderMobileView(listings)
       ) : (
         <div className="mt-4 space-y-8">
           {!url.includes('property_type=') ? (
@@ -142,6 +104,66 @@ export function Listings({ listings, count }: ListingsProps) {
       )}
 
       <ScrollToTopButton />
+    </div>
+  )
+}
+
+function renderMobileView(listings: { [key: string]: Listing[] } | Listing[]) {
+  const chunkListings = useCallback((items: Listing[], size: number) => {
+    const chunks: Listing[][] = []
+    for (let i = 0; i < items.length; i += size) {
+      chunks.push(items.slice(i, i + size))
+    }
+
+    return chunks
+  }, [])
+
+  if (Array.isArray(listings)) {
+    return chunkListings(listings, 7).map((chunk, chunkIndex) => (
+      <div key={chunkIndex} className="overflow-x-auto scrollbar-hide">
+        <div
+          className="flex items-center gap-3 pb-4 md:pb-2 max-w-[300px]"
+          style={{ width: 'max-content' }}
+        >
+          {chunk.map((listing) => (
+            <div key={listing.id} className="shrink-0">
+              <ListingItem listing={listing} />
+            </div>
+          ))}
+        </div>
+      </div>
+    ))
+  }
+
+  return (
+    <div className="mt-4 space-y-4">
+      {Object.entries(listings).map(([type, group]) => (
+        <div key={type}>
+          <div className="mb-2 flex items-center justify-between">
+            <h3 className="text-lg font-semibold capitalize">{type}</h3>
+            <Link
+              href={`/?property_type=${type}`}
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              Ver mais
+            </Link>
+          </div>
+          {chunkListings(group, 7).map((chunk, chunkIndex) => (
+            <div key={chunkIndex} className="overflow-x-auto scrollbar-hide">
+              <div
+                className="flex items-center gap-3 pb-4 md:pb-2 max-w-[300px]"
+                style={{ width: 'max-content' }}
+              >
+                {chunk.map((listing) => (
+                  <div key={listing.id} className="shrink-0">
+                    <ListingItem listing={listing} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ))}
     </div>
   )
 }

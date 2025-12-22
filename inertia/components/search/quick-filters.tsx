@@ -123,7 +123,7 @@ export function QuickFilters({ filters = {} }: QuickFiltersProps) {
           key={filter.key}
           variant="secondary"
           size="sm"
-          className="flex items-center gap-1 bg-muted text-muted-foreground hover:bg-muted/80"
+          className="flex items-center gap-1 bg-muted text-muted-foreground hover:bg-muted/80 h-8"
         >
           {filter.label}
           <XIcon

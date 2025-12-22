@@ -190,7 +190,7 @@ export function SearchContent({
   }, [debouncedSearchValue, navigateWithFilters])
 
   return (
-    <div className="flex flex-1/2">
+    <div className="flex flex-1/2 ">
       <div className="flex flex-1/2 gap-2 mr-2">
         <div className="relative flex-1 max-w-2xl flex">
           <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
