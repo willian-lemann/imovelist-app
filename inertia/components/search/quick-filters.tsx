@@ -29,14 +29,21 @@ export function QuickFilters({ filters = {} }: QuickFiltersProps) {
     searchParams.has('bathrooms') ||
     searchParams.has('parking')
 
-  const handleRemoveFilter = (key: string) => {
+  const handleRemoveFilter = (key: string, prefetch = false) => {
     const url = new URL(window.location.href)
     url.searchParams.delete(key)
-    router.visit(url.pathname + url.search, { preserveState: true })
+    if (prefetch) {
+      router.prefetch(url.pathname + url.search, { only: ['listings', 'filters'] })
+    } else {
+      router.visit(url.pathname + url.search, {
+        preserveState: true,
+        only: ['listings', 'filters'],
+      })
+    }
   }
 
   const handleClearAll = () => {
-    router.visit(window.location.pathname, { preserveState: true })
+    router.visit(window.location.pathname, { preserveState: false })
   }
 
   useEffect(() => {
@@ -120,6 +127,7 @@ export function QuickFilters({ filters = {} }: QuickFiltersProps) {
         >
           {filter.label}
           <XIcon
+            onMouseDown={() => {}}
             className="h-3.5 w-3.5 cursor-pointer"
             onClick={() => handleRemoveFilter(filter.key)}
           />

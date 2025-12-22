@@ -50,7 +50,7 @@ export default function Signup({ errors: serverErrors }: SignupProps) {
     setProcessing(true)
 
     try {
-      await axios.post('/signup', submitData)
+      await axios.post('/api/signup', submitData)
     } catch (error: any) {
       if (error.response?.data?.errors) {
         const serverErrors = error.response.data.errors

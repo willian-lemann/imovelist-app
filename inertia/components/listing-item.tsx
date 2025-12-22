@@ -60,8 +60,8 @@ export function ListingItem({ listing }: ListingItemProps) {
           <div className="relative">
             <div className="w-36 md:w-auto h-32 md:h-[180px] brightness-100 transition-all duration-300 md:rounded-lg overflow-hidden">
               <PhotoCarouselItem
-                href={listing.photos[0]}
-                blurImage={listing.photos[0]}
+                href={listing.photos![0]}
+                blurImage={listing.photos![0]}
                 isFirst={true}
               />
             </div>

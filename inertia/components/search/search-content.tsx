@@ -38,7 +38,7 @@ export function SearchContent({
       preserveState: true,
       preserveScroll: true,
       replace: true, // Don't pollute browser history
-      only: ['listings', 'count', 'filters'], // Only reload these props
+      only: ['listings', 'filters'], // Only reload these props
     })
   }, [])
 
@@ -120,6 +120,8 @@ export function SearchContent({
     [currentFilter, navigateWithFilters]
   )
 
+  const handlePrefetchFilter = () => {}
+
   const handleType = useCallback(
     (type: string) => {
       const params = new URLSearchParams(window.location.search)
@@ -136,12 +138,21 @@ export function SearchContent({
     [currentPropertyType, navigateWithFilters]
   )
 
-  const clearFilters = useCallback(() => {
-    router.visit(window.location.pathname, {
-      preserveState: true,
-      replace: true,
-      only: ['listings', 'count', 'filters'],
-    })
+  const clearFilters = useCallback((prefetch = false) => {
+    const only = ['listings', 'filters']
+
+    if (prefetch) {
+      router.prefetch(window.location.pathname, {
+        only,
+      })
+    } else {
+      router.visit(window.location.pathname, {
+        preserveState: true,
+        replace: true,
+        only,
+      })
+    }
+
     setFilters(initialFilters)
     setSearchValue('')
   }, [])

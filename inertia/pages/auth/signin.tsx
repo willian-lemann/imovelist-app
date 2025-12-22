@@ -40,7 +40,7 @@ export default function Signin({ errors: serverErrors }: SigninProps) {
     setProcessing(true)
 
     try {
-      await axios.post('/signin', data)
+      await axios.post('/api/signin', data)
       router.visit('/')
     } catch (error: any) {
       if (error.response?.data?.errors) {

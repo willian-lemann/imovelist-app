@@ -1,19 +1,19 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
 const HomeController = () => import('#controllers/home_controller')
+const DetailsController = () => import('#controllers/details_controller')
 const ListingsController = () => import('#controllers/listings_controller')
 const SessionController = () => import('#controllers/session_controller')
 
 router.get('/', [HomeController, 'index'])
+router.get('/imoveis/:id/:slug', [DetailsController, 'index'])
 
-router
-  .group(() => {
-    router.get('/login', [SessionController, 'showSignin'])
-    router.post('/signin', [SessionController, 'store'])
-    router.get('/signup', [SessionController, 'showSignup'])
-    router.post('/signup', [SessionController, 'create'])
-  })
-  .use(middleware.guest())
+router.group(() => {
+  router.get('/login', [SessionController, 'showSignin']).use(middleware.guest())
+  router.post('/api/signin', [SessionController, 'store'])
+  router.get('/signup', [SessionController, 'showSignup'])
+  router.post('/api/signup', [SessionController, 'create'])
+})
 
 router.post('/logout', [SessionController, 'destroy']).use(middleware.auth())
 

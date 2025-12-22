@@ -27,7 +27,7 @@ export default function Home({
 
       <div className="px-0">
         <div>
-          <Header currentUser={currentUser} isAuthenticated={isAuthenticated} />
+          <Header currentUser={currentUser} />
         </div>
 
         <div className="mx-auto max-w-[1350px]">

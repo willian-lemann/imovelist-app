@@ -3,8 +3,6 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 export default class HomeController {
   public async index({ inertia, request, auth }: HttpContext) {
-    const currentUser = auth.getUserOrFail()
-
     const page = request.input('page', 1)
     const limit = 21
 
@@ -82,19 +80,41 @@ export default class HomeController {
 
     const listings = await query
       .orderBy('created_at', 'desc')
-      .orderBy('agent_id', 'desc')
+      .orderBy('type', 'desc')
       .offset((page - 1) * limit)
       .limit(limit)
 
+    // Group listings by type
+    const groupedListings = listings.reduce<Record<string, any[]>>((acc, listing) => {
+      const type = listing.type || 'Unknown'
+      if (!acc[type]) acc[type] = []
+      acc[type].push(listing.serialize())
+      return acc
+    }, {})
+
+    const orderedTypes = ['Apartamento', 'Casa', 'Terreno']
+    const orderedGroupedListings: Record<string, any[]> = {}
+
+    for (const type of orderedTypes) {
+      if (groupedListings[type]) {
+        orderedGroupedListings[type] = groupedListings[type]
+      }
+    }
+    // Add remaining types (if any) after the main ones
+    for (const type of Object.keys(groupedListings)) {
+      if (!orderedTypes.includes(type)) {
+        orderedGroupedListings[type] = groupedListings[type]
+      }
+    }
+
     return inertia.render('home', {
-      listings: listings.map((listing) => {
-        const listingItem = listing.serialize()
-        return listingItem
-      }),
+      listings: propertyType
+        ? listings.map((listing) => listing.serialize())
+        : orderedGroupedListings,
       filters: request.qs(),
       count: Number(total),
       isAuthenticated: auth.isAuthenticated,
-      currentUser: currentUser.serialize(),
+      currentUser: auth.user ? auth.user.serialize() : null,
     })
   }
 }
