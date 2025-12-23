@@ -27,7 +27,7 @@ export default class ScrappedListing extends BaseModel {
   declare price: number | null
 
   @column()
-  declare area: string | null
+  declare area: number | null
 
   @column()
   declare bedrooms: number | null

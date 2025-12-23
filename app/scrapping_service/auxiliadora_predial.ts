@@ -12,7 +12,7 @@ interface ScrapedListing {
   image: string | null
   address: string | null
   price: number | null
-  area: string | null
+  area: number | null
   bedrooms: number | null
   type: string | null
   forSale: boolean | null
@@ -165,12 +165,13 @@ async function scrapeCurrentPage(page: Page, baseUrl: string): Promise<ScrapedLi
 
     // ÁREA (300m²)
     const areaEl = item.locator('img[alt="Metragem"] + span').first()
-    let area: string | null = await areaEl.textContent().catch(() => null)
-    if (area) {
-      if (area.includes('0m²')) {
-        area = null
-      } else {
-        area = area.trim()
+    let areaText: string | null = await areaEl.textContent().catch(() => null)
+    let area: number | null = null
+    if (areaText) {
+      areaText = areaText.trim()
+      if (!areaText.includes('0m²')) {
+        const match = areaText.replace(/\D/g, '')
+        area = match ? Number(match) : null
       }
     }
 
