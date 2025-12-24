@@ -58,7 +58,7 @@ export function ListingItem({ listing }: ListingItemProps) {
           ) : null}
 
           <div className="relative">
-            <div className="w-36 md:w-auto h-32 md:h-[180px] brightness-100 transition-all duration-300 md:rounded-lg overflow-hidden">
+            <div className="w-36 md:w-auto h-32 md:h-[150px] brightness-100 transition-all duration-300 md:rounded-lg overflow-hidden">
               <PhotoCarouselItem
                 href={listing.photos![0]}
                 blurImage={listing.photos![0]}
@@ -66,9 +66,12 @@ export function ListingItem({ listing }: ListingItemProps) {
               />
             </div>
 
-            <div className="absolute top-3 left-3 z-40 inline-block px-4 py-1 text-xs font-medium rounded-full bg-primary-foreground/90  text-primary">
+            <Badge
+              variant="secondary"
+              className="absolute top-2 px-2 py-[1px] left-2 text-primary/90 text-[10px]"
+            >
               {listing.forSale ? 'Venda' : 'Aluguel'}
-            </div>
+            </Badge>
           </div>
         </div>
 

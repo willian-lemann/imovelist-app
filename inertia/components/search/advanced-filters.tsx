@@ -87,10 +87,11 @@ export function AdvancedFilters({
       </DropdownMenuTrigger>
       {isOpen && (
         <DropdownMenuContent
-          align="end"
-          className="px-4 md:max-w-md md:min-w-md flex flex-col mt-4"
+          align="center"
+          className="px-2 mx-[7px] md:max-w-md md:min-w-md -translate-x-[0.5px] -translate-y-2 flex flex-col mt-4 shadow-2xl"
         >
           <DropdownMenuLabel className="px-0">Filtros</DropdownMenuLabel>
+
           <DropdownMenuSeparator />
 
           <div className="space-y-2 pb-10">
@@ -188,7 +189,7 @@ export function AdvancedFilters({
 
           <div className="flex gap-2 self-end">
             <Button className="mb-4" variant="outline" onClick={onReset}>
-              Resetar
+              Limpar
             </Button>
             <Button
               onClick={() => {
@@ -198,7 +199,7 @@ export function AdvancedFilters({
               disabled={isFetching}
               className="mb-4 disabled:opacity-20"
             >
-              Aplicar
+              Pesquisar
             </Button>
           </div>
         </DropdownMenuContent>

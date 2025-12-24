@@ -26,7 +26,7 @@ export function DropdownType({ onFilter, currentType }: FilterPropertyType) {
         <Button variant="outline" size="default" className="gap-1">
           <ListFilterIcon className="h-3.5 w-3.5" />
           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-            {Capitalize(currentType) || 'Tipo de imóvel'}
+            {Capitalize(currentType!) || 'Tipo de imóvel'}
           </span>
         </Button>
       </DropdownMenuTrigger>
@@ -36,6 +36,7 @@ export function DropdownType({ onFilter, currentType }: FilterPropertyType) {
             key={type.value}
             checked={currentType === type.value}
             onClick={() => onFilter(type.value)}
+            className="px-2"
           >
             {type.label}
           </DropdownMenuCheckboxItem>

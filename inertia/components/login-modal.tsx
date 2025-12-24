@@ -16,12 +16,14 @@ export function LoginModal({ children, onOpenChange }: LoginModalProps) {
   const [loginData, setLoginData] = useState({
     email: '',
     password: '',
+    fullName: '',
   })
   const [loginErrors, setLoginErrors] = useState<Record<string, string>>({})
   const [isLoginProcessing, setIsLoginProcessing] = useState(false)
 
   const [signupData, setSignupData] = useState({
     email: '',
+    fullName: '',
     password: '',
     password_confirmation: '',
   })
@@ -34,9 +36,9 @@ export function LoginModal({ children, onOpenChange }: LoginModalProps) {
     }
     // Reset forms when modal closes
     if (!open) {
-      setLoginData({ email: '', password: '' })
+      setLoginData({ email: '', password: '', fullName: '' })
       setLoginErrors({})
-      setSignupData({ email: '', password: '', password_confirmation: '' })
+      setSignupData({ email: '', fullName: '', password: '', password_confirmation: '' })
       setSignupErrors({})
     }
   }
@@ -139,6 +141,20 @@ export function LoginModal({ children, onOpenChange }: LoginModalProps) {
               {signupErrors.general && (
                 <p className="text-sm text-red-500">{signupErrors.general}</p>
               )}
+              <div className="space-y-2">
+                <Label htmlFor="signup-fullname">Full Name</Label>
+                <Input
+                  id="signup-fullname"
+                  type="text"
+                  placeholder="Enter your full name"
+                  value={signupData.fullName}
+                  onChange={(e) => setSignupData({ ...signupData, fullName: e.target.value })}
+                  required
+                />
+                {signupErrors.fullName && (
+                  <p className="text-sm text-red-500">{signupErrors.fullName}</p>
+                )}
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="signup-email">Email</Label>
                 <Input

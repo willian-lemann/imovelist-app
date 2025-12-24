@@ -5,9 +5,13 @@ const HomeController = () => import('#controllers/home_controller')
 const DetailsController = () => import('#controllers/details_controller')
 const ListingsController = () => import('#controllers/listings_controller')
 const SessionController = () => import('#controllers/session_controller')
+const DashboardController = () => import('#controllers/dashboard_controller')
 
 router.get('/', [HomeController, 'index'])
 router.get('/imoveis/:id/:slug', [DetailsController, 'index'])
+
+// Dashboard route (protected)
+router.get('/dashboard', [DashboardController, 'index']).use(middleware.auth())
 
 router.group(() => {
   router.get('/login', [SessionController, 'showSignin']).use(middleware.guest())
@@ -18,11 +22,13 @@ router.group(() => {
 
 router.post('/logout', [SessionController, 'destroy']).use(middleware.auth())
 
-router.group(() => {
-  router.get('/listings/create', [ListingsController, 'create'])
-  router.post('/listings', [ListingsController, 'store'])
-  router.get('/listings/:id', [ListingsController, 'show'])
-  router.get('/listings/:id/edit', [ListingsController, 'edit'])
-  router.put('/listings/:id', [ListingsController, 'update'])
-  router.delete('/listings/:id', [ListingsController, 'destroy'])
-})
+// API routes for client-side fetching
+router
+  .group(() => {
+    router.get('/listings', [ListingsController, 'index'])
+    router.get('/listings/:id', [ListingsController, 'show'])
+    router.post('/listings', [ListingsController, 'store']).use(middleware.auth())
+    router.put('/listings/:id', [ListingsController, 'update']).use(middleware.auth())
+    router.delete('/listings/:id', [ListingsController, 'destroy']).use(middleware.auth())
+  })
+  .prefix('/api')

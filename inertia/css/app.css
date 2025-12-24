@@ -48,12 +48,12 @@
    --radius: 0.625rem;
    --font-inter: "Inter", sans-serif;
    --background: oklch(1 0 0);
-   --foreground: oklch(0.129 0.042 264.695);
+   --foreground: #09090a;
    --card: oklch(1 0 0);
-   --card-foreground: oklch(0.129 0.042 264.695);
+   --card-foreground: #09090a;
    --popover: oklch(1 0 0);
-   --popover-foreground: oklch(0.129 0.042 264.695);
-   --primary: #1a0f3b;
+   --popover-foreground: #09090a;
+   --primary: #8234ea;
    --primary-foreground: oklch(0.984 0.003 247.858);
    --secondary: oklch(0.968 0.007 247.896);
    --secondary-foreground: oklch(0.208 0.042 265.755);
@@ -71,7 +71,7 @@
    --chart-4: oklch(0.828 0.189 84.429);
    --chart-5: oklch(0.769 0.188 70.08);
    --sidebar: oklch(0.984 0.003 247.858);
-   --sidebar-foreground: oklch(0.129 0.042 264.695);
+   --sidebar-foreground: #09090a;
    --sidebar-primary: oklch(0.208 0.042 265.755);
    --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
    --sidebar-accent: oklch(0.968 0.007 247.896);
@@ -116,7 +116,7 @@ button {
 }
 
 .dark {
-   --background: oklch(0.129 0.042 264.695);
+   --background: #09090a;
    --foreground: oklch(0.984 0.003 247.858);
    --card: oklch(0.208 0.042 265.755);
    --card-foreground: oklch(0.984 0.003 247.858);

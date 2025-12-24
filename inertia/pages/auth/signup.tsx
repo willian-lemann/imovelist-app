@@ -1,4 +1,4 @@
-import { Head, Link, router } from '@inertiajs/react'
+import { Head, Link } from '@inertiajs/react'
 import { useForm as useReactHookForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -46,9 +46,7 @@ export default function Signup({ errors: serverErrors }: SignupProps) {
 
   const onSubmit = async (data: SignupFormData) => {
     const { confirmPassword, ...submitData } = data
-
     setProcessing(true)
-
     try {
       await axios.post('/api/signup', submitData)
     } catch (error: any) {
