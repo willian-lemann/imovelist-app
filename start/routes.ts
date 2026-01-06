@@ -6,6 +6,8 @@ const DetailsController = () => import('#controllers/details_controller')
 const ListingsController = () => import('#controllers/listings_controller')
 const SessionController = () => import('#controllers/session_controller')
 const DashboardController = () => import('#controllers/dashboard_controller')
+const GalleryController = () => import('#controllers/gallery_controller')
+const GroupTypesController = () => import('#controllers/group_types_controller')
 
 router.get('/', [HomeController, 'index'])
 router.get('/imoveis/:id/:slug', [DetailsController, 'index'])
@@ -30,5 +32,13 @@ router
     router.post('/listings', [ListingsController, 'store']).use(middleware.auth())
     router.put('/listings/:id', [ListingsController, 'update']).use(middleware.auth())
     router.delete('/listings/:id', [ListingsController, 'destroy']).use(middleware.auth())
+
+    router.get('/group-types', [GroupTypesController, 'index'])
+
+    // Gallery routes (protected)
+    router.get('/gallery/:listingId', [GalleryController, 'index'])
+    router.post('/gallery/:listingId', [GalleryController, 'store']).use(middleware.auth())
+    router.delete('/gallery/:id', [GalleryController, 'destroy']).use(middleware.auth())
+    router.put('/gallery/:listingId/reorder', [GalleryController, 'reorder']).use(middleware.auth())
   })
   .prefix('/api')

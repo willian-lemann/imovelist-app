@@ -90,7 +90,7 @@ export function LoginModal({ children, onOpenChange }: LoginModalProps) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="max-w-md w-full">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">Sign in or create account</h2>
+          <h2 className="text-lg font-semibold">Login ou crie uma conta</h2>
           <DialogClose asChild>
             <Button variant="ghost" size="icon">
               <XIcon className="w-5 h-5" />
@@ -100,7 +100,7 @@ export function LoginModal({ children, onOpenChange }: LoginModalProps) {
         <Tabs defaultValue="login" className="w-full">
           <TabsList className="grid grid-cols-2 mb-6">
             <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsTrigger value="signup">Criar uma conta</TabsTrigger>
           </TabsList>
           <TabsContent value="login">
             <form className="space-y-4" onSubmit={handleLogin}>
@@ -110,7 +110,7 @@ export function LoginModal({ children, onOpenChange }: LoginModalProps) {
                 <Input
                   id="login-email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="Entre com seu melhor email"
                   value={loginData.email}
                   onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                   required
@@ -118,11 +118,11 @@ export function LoginModal({ children, onOpenChange }: LoginModalProps) {
                 {loginErrors.email && <p className="text-sm text-red-500">{loginErrors.email}</p>}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="login-password">Password</Label>
+                <Label htmlFor="login-password">Senha</Label>
                 <Input
                   id="login-password"
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder="Entre com sua senha"
                   value={loginData.password}
                   onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                   required
@@ -132,7 +132,7 @@ export function LoginModal({ children, onOpenChange }: LoginModalProps) {
                 )}
               </div>
               <Button type="submit" className="w-full" disabled={isLoginProcessing}>
-                {isLoginProcessing ? 'Logging in...' : 'Login'}
+                {isLoginProcessing ? 'Fazendo login...' : 'Entrar'}
               </Button>
             </form>
           </TabsContent>

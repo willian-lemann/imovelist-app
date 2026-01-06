@@ -59,8 +59,8 @@ export default class ScrappedListing extends BaseModel {
   @column()
   declare placeholderImage: string | null
 
-  @column()
-  declare agentId: string | null
+  @column({ columnName: 'agent_id' })
+  declare agentId: number | null
 
   @column()
   declare published: boolean

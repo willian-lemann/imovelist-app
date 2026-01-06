@@ -43,7 +43,7 @@ export function Sidebar({
       id: tabMap.GALLERY,
       label: 'Galeria',
       icon: Images,
-      premium: true,
+      premium: false,
     },
     {
       id: tabMap.AI_PAGE_GENERATOR,

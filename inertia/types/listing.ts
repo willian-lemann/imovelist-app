@@ -32,10 +32,12 @@ export interface ListingsFilters {
   price_range?: string
   area_range?: string
   page?: number
+  userId?: number
 }
 
 export interface ListingsResponse {
   listings: ListingType[] | Record<string, ListingType[]>
+  groupTypes: string[]
   count: number
   meta: {
     total: number

@@ -88,7 +88,7 @@ export function AdvancedFilters({
       {isOpen && (
         <DropdownMenuContent
           align="center"
-          className="px-2 mx-[7px] md:max-w-md md:min-w-md -translate-x-[0.5px] -translate-y-2 flex flex-col mt-4 shadow-2xl"
+          className="px-4 mx-[7px] md:max-w-md md:min-w-md -translate-x-[0.5px] -translate-y-2 flex flex-col mt-4 shadow-2xl"
         >
           <DropdownMenuLabel className="px-0">Filtros</DropdownMenuLabel>
 
@@ -188,10 +188,11 @@ export function AdvancedFilters({
           </div>
 
           <div className="flex gap-2 self-end">
-            <Button className="mb-4" variant="outline" onClick={onReset}>
+            <Button size="sm" className="mb-4" variant="outline" onClick={onReset}>
               Limpar
             </Button>
             <Button
+              size="sm"
               onClick={() => {
                 setIsOpen(false)
                 onApply()

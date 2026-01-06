@@ -1,5 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
+import Gallery from '#models/gallery'
+import User from './user.js'
 
 export default class Listing extends BaseModel {
   @column({ isPrimary: true })
@@ -35,7 +38,7 @@ export default class Listing extends BaseModel {
   @column()
   declare type: string | null
 
-  @column()
+  @column({ columnName: 'for_sale' })
   declare forSale: boolean | null
 
   @column()
@@ -45,7 +48,7 @@ export default class Listing extends BaseModel {
   declare content: string | null
 
   @column()
-  declare photos: string[] | null
+  declare photos: any | null
 
   @column()
   declare agency: string | null
@@ -56,12 +59,18 @@ export default class Listing extends BaseModel {
   @column()
   declare ref: string | null
 
-  @column()
+  @column({ columnName: 'placeholder_image' })
   declare placeholderImage: string | null
 
-  @column()
-  declare agent_id: string | null
+  @column({ columnName: 'agent_id' })
+  declare agentId: number | null
 
   @column()
   declare published: boolean
+
+  @hasMany(() => Gallery)
+  declare gallery: HasMany<typeof Gallery>
+
+  @belongsTo(() => User)
+  declare user: BelongsTo<typeof User>
 }

@@ -18,9 +18,6 @@ export const listingsKeys = {
   detail: (id: number) => [...listingsKeys.details(), id] as const,
 }
 
-/**
- * Hook to fetch paginated listings with filters
- */
 export function useListings(filters: ListingsFilters = {}) {
   return useQuery<ListingsResponse>({
     queryKey: listingsKeys.list(filters),
@@ -48,7 +45,6 @@ export function useCreateListing() {
   return useMutation({
     mutationFn: (payload: CreateListingPayload) => listingsApi.createListing(payload),
     onSuccess: () => {
-      // Invalidate all listing lists to refetch
       queryClient.invalidateQueries({ queryKey: listingsKeys.lists() })
     },
   })
@@ -84,6 +80,16 @@ export function useDeleteListing() {
       queryClient.removeQueries({ queryKey: listingsKeys.detail(id) })
       // Invalidate lists to refetch
       queryClient.invalidateQueries({ queryKey: listingsKeys.lists() })
+    },
+  })
+}
+
+export function useGroupTypes() {
+  return useQuery<string[]>({
+    queryKey: [...listingsKeys.all, 'groupTypes'],
+    queryFn: async () => {
+      const data = await listingsApi.getGroupTypes()
+      return data
     },
   })
 }

@@ -11,7 +11,7 @@ export default class ListingsController {
   public async index({ request, response }: HttpContext) {
     const page = request.input('page', 1)
 
-    // Get filter parameters from query string
+    const userId = request.input('userId')
     const search = request.input('q')
     const filter = request.input('filter')
     const propertyType = request.input('property_type')
@@ -21,7 +21,6 @@ export default class ListingsController {
     const priceRangeStr = request.input('price_range')
     const areaRangeStr = request.input('area_range')
 
-    // Build the query with only needed columns for list view
     const query = Listing.query().select([
       'id',
       'name',
@@ -38,10 +37,17 @@ export default class ListingsController {
       'bathrooms',
       'ref',
       'placeholderImage',
+      'agent_id',
+      'published',
       'createdAt',
     ])
 
-    // Search filter - search in address or ref
+    query.preload('gallery')
+
+    if (userId) {
+      query.where('agent_id', String(userId))
+    }
+
     if (search) {
       query.where((builder) => {
         builder.whereILike('address', `%${search}%`).orWhereILike('ref', `%${search}%`)
@@ -90,20 +96,25 @@ export default class ListingsController {
       }
     }
 
-    // Use paginate()
     const paginatedListings = await query
       .orderBy('created_at', 'desc')
-      .orderBy('type', 'desc')
       .paginate(page, ListingsController.LIMIT)
 
     const serialized = paginatedListings.serialize()
-    const listings = serialized.data
+    const listings = serialized.data as Listing[]
 
-    // Group listings by type (only when not filtering by property type)
-    const formattedListings = propertyType ? listings : this.groupListingsByType(listings)
+    const shouldShowNormalListings = propertyType || userId
+
+    const formattedListings = shouldShowNormalListings
+      ? listings.map((listing) => {
+          listing.photos = listing.photos ? listing.photos : []
+          return listing
+        })
+      : this.groupListingsByType(listings).listingsGroupedByType
 
     return response.ok({
       listings: formattedListings,
+      groupTypes: this.groupListingsByType(listings).types,
       count: serialized.meta.total,
       meta: serialized.meta,
     })
@@ -150,7 +161,7 @@ export default class ListingsController {
 
     const listing = await Listing.create({
       ...data,
-      agent_id: user?.id?.toString(),
+      agentId: user?.id || null,
     })
 
     return response.created(listing.serialize())
@@ -207,13 +218,12 @@ export default class ListingsController {
     return response.ok({ message: 'Listing deleted successfully' })
   }
 
-  /**
-   * Groups listings by type in a predefined order
-   */
-  private groupListingsByType(listings: Record<string, any>[]): Record<string, any[]> {
-    const grouped: Record<string, any[]> = {}
+  private groupListingsByType(listings: Listing[]): {
+    types: string[]
+    listingsGroupedByType: Record<string, Listing[]>
+  } {
+    const grouped: Record<string, Listing[]> = {}
 
-    // Initialize ordered types first to maintain order
     for (const type of ListingsController.ORDERED_TYPES) {
       grouped[type] = []
     }
@@ -227,13 +237,19 @@ export default class ListingsController {
       grouped[type].push(listing)
     }
 
-    // Remove empty groups
+    // Remove empty groups and collect types
+    const types: string[] = []
     for (const type of Object.keys(grouped)) {
       if (grouped[type].length === 0) {
         delete grouped[type]
+      } else {
+        types.push(type)
       }
     }
 
-    return grouped
+    return {
+      types,
+      listingsGroupedByType: grouped,
+    }
   }
 }

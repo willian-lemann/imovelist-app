@@ -7,6 +7,14 @@ export default class CreateListingsTable extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
 
+      table
+        .integer('agent_id')
+        .unsigned()
+        .references('id')
+        .inTable('users')
+        .onDelete('CASCADE')
+        .nullable()
+
       table.string('name').nullable()
       table.string('link').nullable()
       table.string('image').nullable()
@@ -23,7 +31,6 @@ export default class CreateListingsTable extends BaseSchema {
       table.integer('bathrooms').nullable()
       table.string('ref').nullable()
       table.string('placeholder_image').nullable()
-      table.string('agent_id').nullable()
       table.boolean('published').notNullable().defaultTo(false)
 
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now())

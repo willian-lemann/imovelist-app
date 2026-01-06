@@ -29,7 +29,8 @@ export function ListingItem({ listing }: ListingItemProps) {
     window.open(getListingURL(listing), '_blank')
   }
 
-  const isOwner = listing.agent_id
+  const isOwner = listing.agentId
+
   const name = listing.name || listing.address?.split(',')[0]
 
   return (
@@ -48,7 +49,7 @@ export function ListingItem({ listing }: ListingItemProps) {
 
           handleGoDetails(listing)
         }}
-        className="w-full cursor-pointer max-w-md animate-fadeIn relative shadow-none overflow-hidden rounded-lg border-none transition-all"
+        className="w-full cursor-pointer max-w-md animate-fadeIn relative shadow-none overflow-hidden rounded-[20px] border-none transition-all"
       >
         <div>
           {isOwner ? (
@@ -58,7 +59,7 @@ export function ListingItem({ listing }: ListingItemProps) {
           ) : null}
 
           <div className="relative">
-            <div className="w-36 md:w-auto h-32 md:h-[150px] brightness-100 transition-all duration-300 md:rounded-lg overflow-hidden">
+            <div className="w-40 md:w-auto h-40 brightness-100 transition-all duration-300 rounded-[20px] overflow-hidden">
               <PhotoCarouselItem
                 href={listing.photos![0]}
                 blurImage={listing.photos![0]}
@@ -68,15 +69,15 @@ export function ListingItem({ listing }: ListingItemProps) {
 
             <Badge
               variant="secondary"
-              className="absolute top-2 px-2 py-[1px] left-2 text-primary/90 text-[10px]"
+              className="absolute top-2 px-2 py-px left-2 text-primary/90 text-[10px]"
             >
               {listing.forSale ? 'Venda' : 'Aluguel'}
             </Badge>
           </div>
         </div>
 
-        <div className="py-0 bg-background">
-          <div className="flex mb-2 flex-col">
+        <div className="pt-1 pb-0 bg-background">
+          <div className="flex mb-2 flex-col max-w-40">
             <h3
               title={name!}
               className="truncate font-semibold pr-4 text-[13px] text-foreground/70"

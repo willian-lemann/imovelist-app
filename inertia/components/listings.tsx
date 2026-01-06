@@ -27,7 +27,7 @@ interface ListingsProps {
   initialCount?: number
 }
 
-export function Listings({ initialListings, initialCount }: ListingsProps) {
+export function Listings({ initialCount }: ListingsProps) {
   const { url } = usePage()
 
   const filters = useMemo<ListingsFilters>(() => {
@@ -47,13 +47,12 @@ export function Listings({ initialListings, initialCount }: ListingsProps) {
 
   const [currentPage, setCurrentPage] = useState(filters.page || 1)
 
-  // Fetch listings using react-query
   const { data, isLoading, isFetching } = useListings({
     ...filters,
     page: currentPage,
   })
 
-  const listings = data?.listings ?? initialListings ?? []
+  const listings = data?.listings ?? []
   const count = data?.count ?? initialCount ?? 0
 
   const pageSize = 21
@@ -116,7 +115,7 @@ export function Listings({ initialListings, initialCount }: ListingsProps) {
             <div
               className="grid gap-3"
               style={{
-                gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
               }}
             >
               {(listings as ListingType[]).map((listing) => (
@@ -196,7 +195,7 @@ function MobileView({
           {chunkListings(group, 7).map((chunk, chunkIndex) => (
             <div key={chunkIndex} className="overflow-x-auto scrollbar-hide">
               <div
-                className="flex items-center gap-3 pb-4 md:pb-2 max-w-[300px]"
+                className="flex items-center gap-3 pb-0 md:pb-2 max-w-[320px]"
                 style={{ width: 'max-content' }}
               >
                 {chunk.map((listing) => (
@@ -218,7 +217,7 @@ function NormalView({ group }: { group: ListingType[] }) {
     <div
       className="grid gap-3"
       style={{
-        gridTemplateColumns: `repeat(${Math.min(7, group.length)}, minmax(150px, 150px))`,
+        gridTemplateColumns: `repeat(${Math.min(7, group.length)}, minmax(160px, 160px))`,
       }}
     >
       {group.map((listing) => (
@@ -239,7 +238,7 @@ function CarouselView({ group }: { group: ListingType[] }) {
     >
       <CarouselContent className="ml-0  space-x-3">
         {group.map((listing) => (
-          <CarouselItem key={listing.id} className="basis-[150px] flex w-[150px]">
+          <CarouselItem key={listing.id} className="basis-40 flex w-40 ">
             <ListingItem listing={listing as any} />
           </CarouselItem>
         ))}

@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu'
 import { Capitalize } from '@/lib/utils'
+import { useGroupTypes } from '~/hooks/use-listings'
 
 type FilterPropertyType = {
   onFilter(type: string): void
@@ -14,11 +15,12 @@ type FilterPropertyType = {
 }
 
 export function DropdownType({ onFilter, currentType }: FilterPropertyType) {
-  const types = [
-    { label: 'Apartamento', value: 'apartamento' },
-    { label: 'Comercial', value: 'comercial' },
-    { label: 'Residencial', value: 'residencial' },
-  ]
+  const { data: groupTypesData = [] } = useGroupTypes()
+
+  const types = groupTypesData.map((type) => ({
+    value: type,
+    label: Capitalize(type),
+  }))
 
   return (
     <DropdownMenu modal={false}>

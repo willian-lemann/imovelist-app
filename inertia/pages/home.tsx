@@ -3,15 +3,13 @@ import { Header } from '~/components/header'
 import { Listings } from '~/components/listings'
 import { Search } from '~/components/search'
 import { QuickFilters } from '~/components/search/quick-filters'
-import type { ListingType } from '~/types/listing'
 
 type HomeProps = {
-  listings?: ListingType[] | Record<string, ListingType[]>
   filters: Record<string, string>
   count?: number
 }
 
-export default function Home({ listings, filters = {}, count }: HomeProps) {
+export default function Home({ filters = {}, count }: HomeProps) {
   return (
     <>
       <Head title="Imovelist - Encontre facilmente seu imóvel dos sonhos" />
@@ -37,11 +35,11 @@ export default function Home({ listings, filters = {}, count }: HomeProps) {
             data-nofilters={Object.keys(filters).length === 0}
             className="data-[nofilters=true]:py-0 data-[nofilters=false]:py-2 px-4 md:px-0"
           >
-            <QuickFilters filters={filters} />
+            <QuickFilters />
           </div>
 
           <div className="w-full mt-0 md:px-0 px-4">
-            <Listings initialListings={listings} initialCount={count} />
+            <Listings initialCount={count} />
           </div>
         </div>
       </div>

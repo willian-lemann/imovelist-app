@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Images, Upload, X, Lock, Trash2 } from 'lucide-react'
+import { Images, Upload, X, Lock, Trash2, GripVertical } from 'lucide-react'
 
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
@@ -12,21 +12,43 @@ import {
 } from '~/components/ui/select'
 import { Badge } from '~/components/ui/badge'
 import { Skeleton } from '~/components/ui/skeleton'
-import { useListings, useUpdateListing } from '~/hooks/use-listings'
+import { useListings } from '~/hooks/use-listings'
+import {
+  useGalleryPhotos,
+  useUploadGalleryPhotos,
+  useDeleteGalleryPhoto,
+  type GalleryPhoto,
+} from '~/hooks/use-gallery'
 import { toast } from 'sonner'
+import { usePage } from '@inertiajs/react'
+import GalleryUpload from '~/components/file-upload/gallery-upload'
 
 type GallerySectionProps = {
   isPremium?: boolean
 }
+type NewPhoto = { file: File; preview: string }
 
 export function GallerySection({ isPremium = false }: GallerySectionProps) {
-  const { data, isLoading } = useListings({ page: 1 })
-  const updateMutation = useUpdateListing()
+  const { currentUser } = usePage<{
+    currentUser: { id: number }
+  }>().props
+
+  const { data, isLoading } = useListings({ page: 1, userId: currentUser?.id })
 
   const [selectedListingId, setSelectedListingId] = useState<string>('')
-  const [newPhotos, setNewPhotos] = useState<string[]>([])
+
+  console.log('Selected Listing ID:', selectedListingId)
+  const [newPhotos, setNewPhotos] = useState<NewPhoto[]>([])
+
+  const { data: galleryPhotos = [], isLoading: isLoadingGallery } = useGalleryPhotos(
+    selectedListingId ? Number(selectedListingId) : null
+  )
+
+  const uploadMutation = useUploadGalleryPhotos()
+  const deleteMutation = useDeleteGalleryPhoto()
 
   const listings = Array.isArray(data?.listings) ? data.listings : []
+
   const selectedListing = listings.find((l) => l.id === Number(selectedListingId))
 
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,19 +58,12 @@ export function GallerySection({ isPremium = false }: GallerySectionProps) {
     if (!files) return
 
     const fileArray = Array.from(files)
-    const readers = fileArray.map(
-      (file) =>
-        new Promise<string>((resolve, reject) => {
-          const reader = new FileReader()
-          reader.onload = (e) => resolve(e.target?.result as string)
-          reader.onerror = reject
-          reader.readAsDataURL(file)
-        })
-    )
+    const newPhotoObjs = fileArray.map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+    }))
 
-    Promise.all(readers).then((images) => {
-      setNewPhotos((prev) => [...prev, ...images])
-    })
+    setNewPhotos((prev) => [...prev, ...newPhotoObjs])
 
     event.target.value = ''
   }
@@ -57,15 +72,13 @@ export function GallerySection({ isPremium = false }: GallerySectionProps) {
     setNewPhotos((prev) => prev.filter((_, i) => i !== index))
   }
 
-  const handleRemoveExistingPhoto = async (photoUrl: string) => {
-    if (!selectedListing || !isPremium) return
-
-    const updatedPhotos = (selectedListing.photos || []).filter((p) => p !== photoUrl)
+  const handleDeletePhoto = async (photo: GalleryPhoto) => {
+    if (!selectedListingId || !isPremium) return
 
     try {
-      await updateMutation.mutateAsync({
-        id: selectedListing.id,
-        photos: updatedPhotos,
+      await deleteMutation.mutateAsync({
+        photoId: photo.id,
+        listingId: Number(selectedListingId),
       })
       toast.success('Foto removida com sucesso!')
     } catch {
@@ -74,19 +87,20 @@ export function GallerySection({ isPremium = false }: GallerySectionProps) {
   }
 
   const handleSavePhotos = async () => {
-    if (!selectedListing || !isPremium || newPhotos.length === 0) return
-
-    const updatedPhotos = [...(selectedListing.photos || []), ...newPhotos]
+    if (!selectedListingId || !isPremium || newPhotos.length === 0) return
 
     try {
-      await updateMutation.mutateAsync({
-        id: selectedListing.id,
-        photos: updatedPhotos,
+      await uploadMutation.mutateAsync({
+        listingId: Number(selectedListingId),
+        files: newPhotos.map((p) => p.file),
       })
+
+      // Clean up object URLs
+      newPhotos.forEach((p) => URL.revokeObjectURL(p.preview))
       setNewPhotos([])
-      toast.success('Fotos adicionadas com sucesso!')
+      toast.success('Fotos enviadas com sucesso!')
     } catch {
-      toast.error('Erro ao salvar fotos')
+      toast.error('Erro ao enviar fotos')
     }
   }
 
@@ -110,7 +124,8 @@ export function GallerySection({ isPremium = false }: GallerySectionProps) {
               <h3 className="font-semibold text-amber-800">Recurso Premium</h3>
               <p className="mt-1 text-sm text-amber-700">
                 Gerencie a galeria de fotos de seus imóveis de forma profissional. Adicione, remova
-                e organize as fotos de cada anúncio.
+                e organize as fotos de cada anúncio. As fotos são armazenadas em nuvem de alta
+                disponibilidade.
               </p>
               <Button size="sm" className="mt-4">
                 Fazer Upgrade
@@ -119,7 +134,6 @@ export function GallerySection({ isPremium = false }: GallerySectionProps) {
           </div>
         </div>
 
-        {/* Preview of locked feature */}
         <Card className="opacity-60">
           <CardHeader>
             <CardTitle>Selecione um imóvel</CardTitle>
@@ -159,9 +173,9 @@ export function GallerySection({ isPremium = false }: GallerySectionProps) {
     <div className="grid gap-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold tracking-tight">Galeria</h2>
-        <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700">
+        {/* <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700">
           Premium Ativo
-        </Badge>
+        </Badge> */}
       </div>
 
       {/* Listing Selector */}
@@ -190,101 +204,91 @@ export function GallerySection({ isPremium = false }: GallerySectionProps) {
         </CardContent>
       </Card>
 
-      {/* Gallery */}
-      {selectedListing && (
-        <>
-          {/* Current Photos */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Fotos atuais</CardTitle>
-              <CardDescription>
-                {selectedListing.photos?.length || 0} fotos no imóvel
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {selectedListing.photos && selectedListing.photos.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  {selectedListing.photos.map((photo, index) => (
-                    <div key={index} className="relative group">
-                      <img
-                        src={photo}
-                        alt={`Foto ${index + 1}`}
-                        className="aspect-square w-full object-cover rounded-lg"
-                      />
-                      <button
-                        onClick={() => handleRemoveExistingPhoto(photo)}
-                        disabled={updateMutation.isPending}
-                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <Images className="h-12 w-12 mx-auto text-gray-300 mb-2" />
-                  <p className="text-gray-500">Nenhuma foto cadastrada</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Upload New Photos */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Adicionar novas fotos</CardTitle>
-              <CardDescription>Faça upload de novas fotos para este imóvel</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <label className="block">
-                <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 transition-colors">
-                  <Upload className="h-10 w-10 mx-auto text-gray-400 mb-3" />
-                  <p className="text-sm text-gray-600 font-medium">Clique para selecionar fotos</p>
-                  <p className="text-xs text-gray-400 mt-1">PNG, JPG até 10MB cada</p>
-                </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                />
-              </label>
-
-              {/* Preview of new photos */}
-              {newPhotos.length > 0 && (
-                <>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    {newPhotos.map((photo, index) => (
-                      <div key={index} className="relative group">
-                        <img
-                          src={photo}
-                          alt={`Nova foto ${index + 1}`}
-                          className="aspect-square w-full object-cover rounded-lg"
-                        />
-                        <button
-                          onClick={() => handleRemoveNewPhoto(index)}
-                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
+      {selectedListing && galleryPhotos.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Fotos atuais</CardTitle>
+            <CardDescription>
+              {isLoadingGallery ? 'Carregando...' : `${galleryPhotos.length} foto(s) no imóvel`}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoadingGallery ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <Skeleton key={i} className="aspect-square w-full rounded-lg" />
+                ))}
+              </div>
+            ) : galleryPhotos.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {galleryPhotos.map((photo) => (
+                  <div key={photo.id} className="relative group">
+                    <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab">
+                      <div className="bg-white/80 rounded p-1">
+                        <GripVertical className="h-4 w-4 text-gray-600" />
                       </div>
-                    ))}
+                    </div>
+                    <img
+                      src={photo.url}
+                      alt={`Foto ${photo.order + 1}`}
+                      className="aspect-square w-full object-cover rounded-lg"
+                    />
+                    <button
+                      onClick={() => handleDeletePhoto(photo)}
+                      disabled={deleteMutation.isPending}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                    {photo.size && (
+                      <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                        {(photo.size / 1024).toFixed(0)} KB
+                      </div>
+                    )}
                   </div>
-                  <div className="flex justify-end">
-                    <Button onClick={handleSavePhotos} disabled={updateMutation.isPending}>
-                      {updateMutation.isPending
-                        ? 'Salvando...'
-                        : `Salvar ${newPhotos.length} foto(s)`}
-                    </Button>
-                  </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
-        </>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Images className="h-12 w-12 mx-auto text-gray-300 mb-2" />
+                <p className="text-gray-500">Nenhuma foto cadastrada</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Adicionar novas fotos</CardTitle>
+          <CardDescription>As fotos serão enviadas para o armazenamento em nuvem </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <GalleryUpload
+            maxFiles={20}
+            maxSize={10 * 1024 * 1024}
+            accept="image/*"
+            multiple
+            onFilesChange={(files) => {
+              const newPhotoObjs = files
+                .filter((f) => f.file instanceof File)
+                .map((f) => ({
+                  file: f.file as File,
+                  preview: f.preview || '',
+                }))
+              setNewPhotos(newPhotoObjs)
+            }}
+          />
+
+          {newPhotos.length > 0 && (
+            <div className="mt-4 flex justify-end">
+              <Button onClick={handleSavePhotos} disabled={uploadMutation.isPending}>
+                {uploadMutation.isPending ? 'Enviando...' : `Enviar ${newPhotos.length} foto(s)`}
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

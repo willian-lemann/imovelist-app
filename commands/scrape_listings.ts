@@ -20,7 +20,7 @@ export default class ScrapeListingsCommand extends BaseCommand {
 
     try {
       await ScrappedListing.truncate()
-      await Listing.query().where('name', 'null').delete()
+      await Listing.query().whereNull('name').delete()
 
       await auxiliadoraPredialScrape()
     } catch (error) {

@@ -6,15 +6,12 @@ import { Skeleton } from '~/components/ui/skeleton'
 import { useListings, useDeleteListing, useUpdateListing } from '~/hooks/use-listings'
 import type { ListingType } from '~/types/listing'
 import { toast } from 'sonner'
+import { Capitalize } from '~/lib/utils'
+import { usePage } from '@inertiajs/react'
 
 type ListingsSectionProps = {
   onEdit: (listingId: number) => void
   onCreateNew: () => void
-}
-
-function capitalize(str: string | null): string {
-  if (!str) return ''
-  return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
 function formatPrice(price: number | null, forSale: boolean | null): string {
@@ -27,7 +24,10 @@ function formatPrice(price: number | null, forSale: boolean | null): string {
 }
 
 export function ListingsSection({ onEdit, onCreateNew }: ListingsSectionProps) {
-  const { data, isLoading, error } = useListings({ page: 1 })
+  const { currentUser } = usePage<{ currentUser: { id: number } }>().props
+
+  const { data, isLoading, error } = useListings({ page: 1, userId: currentUser.id })
+  console.log(data)
   const deleteMutation = useDeleteListing()
   const updateMutation = useUpdateListing()
 
@@ -123,7 +123,7 @@ export function ListingsSection({ onEdit, onCreateNew }: ListingsSectionProps) {
                         </p>
                         <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
                           {listing.type && (
-                            <Badge variant="secondary">{capitalize(listing.type)}</Badge>
+                            <Badge variant="secondary">{Capitalize(listing.type)}</Badge>
                           )}
                           {listing.area && (
                             <span className="flex items-center gap-1">

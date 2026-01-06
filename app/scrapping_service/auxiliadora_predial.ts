@@ -1,7 +1,5 @@
 import { chromium, Browser, Page } from 'playwright'
 import logger from '@adonisjs/core/services/logger'
-
-import ScrappedListing from '#models/scrapped_listing'
 import Listing from '#models/listing'
 import ScrappedInfo from '#models/scrapped_info'
 
@@ -18,17 +16,25 @@ interface ScrapedListing {
   forSale: boolean | null
   parking: number | null
   content: string | null
-  photos: any | null
+  photos: string | null
   agency: string | null
   bathrooms: number | null
   ref: string | null
   placeholderImage: string | null
-  agentId: string | null
+  agentId: number | null
   published: boolean
+  fullLink?: string | null
 }
 
+const LISTING_ITEM_SELECTOR = '[class*="CardImoveisVitrine"]'
+const LISTING_ITEM_SELECTOR_CARD = '[class*="CardImoveisVitrine-module"][class*="container"]'
+
 export async function auxiliadoraPredialScrape() {
-  const browser: Browser = await chromium.launch({ headless: true })
+  const browser: Browser = await chromium.launch({
+    headless: true,
+    args: ['--disable-dev-shm-usage', '--no-sandbox'],
+  })
+
   const context = await browser.newContext({
     viewport: { width: 1280, height: 800 },
     userAgent:
@@ -36,65 +42,101 @@ export async function auxiliadoraPredialScrape() {
       'AppleWebKit/537.36 (KHTML, like Gecko) ' +
       'Chrome/120.0 Safari/537.36',
   })
-  const page: Page = await context.newPage()
 
   const baseUrl = 'https://www.auxiliadorapredial.com.br/comprar/residencial/sc+imbituba'
-
-  // SELETOR CORRETO PARA CADA CARD DE IMÓVEL
-  const LISTING_ITEM_SELECTOR = '.CardImoveisVitrine_container__ZZjyw'
-
   const allListings: ScrapedListing[] = []
 
-  // 1. Carregar a primeira página para descobrir o total de páginas
+  // 1. Discover total pages
+  const page = await context.newPage()
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded' })
-  await page.waitForSelector(LISTING_ITEM_SELECTOR, { timeout: 15_000 })
+  await page.waitForSelector(LISTING_ITEM_SELECTOR, { timeout: 15000 })
 
-  // 2. Descobrir o número total de páginas pela paginação
-  // O último botão numérico antes do botão "next" contém o número total de páginas
   const paginationButtons = page.locator('button[aria-label^="Go to page"]')
   const buttonCount = await paginationButtons.count()
   let totalPages = 1
 
   for (let i = 0; i < buttonCount; i++) {
     const btnText = await paginationButtons.nth(i).textContent()
-    const pageNum = Number.parseInt(btnText || '0', 10)
+    const pageNum = Number.parseInt(btnText!)
     if (!Number.isNaN(pageNum) && pageNum > totalPages) {
       totalPages = pageNum
     }
   }
 
+  await page.close()
+
   logger.info(`Total de páginas encontradas: ${totalPages}`)
 
-  // 3. Scrape pages concurrently in batches (limited concurrency)
-  const concurrency = 5 // tune this (2-8); higher is faster but more load on target
+  // 2. Scrape listing pages with controlled concurrency
   const pageUrls = Array.from({ length: totalPages }, (_, i) =>
     i === 0 ? baseUrl : `${baseUrl}?page=${i + 1}`
   )
 
-  for (let i = 0; i < pageUrls.length; i += concurrency) {
-    const batch = pageUrls.slice(i, i + concurrency)
-    logger.info(
-      `Scraping pages ${i + 1}..${i + batch.length} of ${pageUrls.length} (batch size ${batch.length})`
-    )
+  for (let i = 0; i < totalPages; i++) {
+    const url = pageUrls[i]
+    logger.info(`Scraping listing page ${i + 1} of ${pageUrls.length}: ${url}`)
 
-    for (const url of batch) {
-      const pageInstance = await context.newPage()
-      await pageInstance.goto(url, { waitUntil: 'load' })
-      await pageInstance.waitForSelector(LISTING_ITEM_SELECTOR, { timeout: 15_000 })
-      await scrapeCurrentPage(pageInstance, baseUrl).then((listings) => {
-        allListings.push(...listings)
+    const pageInstance = await context.newPage()
+    try {
+      await pageInstance.goto(url, {
+        waitUntil: 'load',
       })
-      await pageInstance.close()
-    }
+      await pageInstance.waitForSelector(LISTING_ITEM_SELECTOR, { timeout: 5000 })
+      const scrapedListings = await scrapeCurrentPage(pageInstance, baseUrl)
 
-    // small pause between batches to reduce load / avoid rate limits
-    if (i + concurrency < pageUrls.length) {
-      await new Promise((res) => setTimeout(res, 500))
+      scrapedListings.forEach((listing) => {
+        allListings.push(listing)
+      })
+    } catch (err) {
+      logger.error(`Error scraping listing page ${url}:`, err)
+      return []
+    } finally {
+      await pageInstance.close()
     }
   }
 
+  logger.info(`Scraped ${allListings.length} unique listings`)
+
+  const mappedDetailsScraped = new Map<string, { content: string; photos: string | null }>()
+
+  logger.info('Starting detailed scraping for each listing...')
+  await fetch('http://localhost:3000/scrape', {
+    body: JSON.stringify({
+      URLs: allListings.map((listing) => listing.fullLink!),
+    }),
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  }).then(async (res) => {
+    const data = (await res.json()) as {
+      results: Array<{ photos: string[]; content: string; url: string; ref: string }>
+    }
+
+    data.results.forEach(({ photos, content, ref }) => {
+      mappedDetailsScraped.set(ref, {
+        content: content || '',
+        photos: photos.length > 0 ? JSON.stringify(photos) : null,
+      })
+    })
+    logger.info('Detailed scraping completed.')
+  })
   await browser.close()
-  logger.info(`Scraping finalizado! Total de ${allListings.length} imóveis coletados.`)
+
+  allListings.forEach((listing) => {
+    const details = mappedDetailsScraped.get(listing.ref!)
+    if (details) {
+      listing.content = details.content
+      listing.photos = details.photos
+    }
+  })
+
+  logger.info(`Scraping finalizado! Total de ${allListings.length} imóveis únicos coletados.`)
+
+  const listingsForDb = allListings.map(({ fullLink, ...listing }) => ({
+    ...listing,
+    image: listing.photos && listing.photos.length > 0 ? listing.photos[0] : null,
+  }))
+
+  logger.info('Saving in database...')
 
   await ScrappedInfo.create({
     agency: 'Auxiliadora Predial',
@@ -102,170 +144,144 @@ export async function auxiliadoraPredialScrape() {
     total_pages: totalPages,
   })
 
-  logger.info(`Scraping completed. Processed ${allListings.length} listings.`)
+  await Listing.createManyQuietly(listingsForDb)
 
-  await ScrappedListing.updateOrCreateMany('ref', allListings)
-  await Listing.updateOrCreateMany('ref', allListings)
+  logger.info(`Database updated with ${allListings.length} listings`)
 }
 
 async function scrapeCurrentPage(page: Page, baseUrl: string): Promise<ScrapedListing[]> {
-  const LISTING_ITEM_SELECTOR = '.CardImoveisVitrine_container__ZZjyw'
+  await page.waitForSelector(`${LISTING_ITEM_SELECTOR} a[target="_blank"][href^="/imovel/"]`, {
+    timeout: 5000,
+  })
 
-  page.setDefaultTimeout(2000)
+  const visibleLinks = page.locator(
+    `${LISTING_ITEM_SELECTOR_CARD} a[target="_blank"][href^="/imovel/"]`
+  )
 
-  const itemLocators = page.locator(LISTING_ITEM_SELECTOR)
-  const totalItems = await itemLocators.count()
+  const linkCount = await visibleLinks.count()
+  const links: string[] = []
+  const linksSeen = new Set<string>()
 
-  const listingPromises = Array.from({ length: totalItems }, async (_, i) => {
-    const item = itemLocators.nth(i)
+  for (let i = 0; i < linkCount; i++) {
+    const link = await visibleLinks.nth(i).getAttribute('href')
 
-    // LINK (URL completa)
-    const linkEl = item.locator('a[target="_blank"]').first()
-    const link = await linkEl.getAttribute('href')
+    // get the ref from each link regex
+    const refMatch = link?.match(/\/venda\/([^\/?#]+)/)
+    const ref = refMatch ? refMatch[1] : null
 
-    // PREÇO (3.950.000)
-    const priceEl = item.locator('span[style*="color: rgb(106, 161, 86)"]', {}).first()
-    let price: string | null = await priceEl.innerText({ timeout: 5000 }).catch(() => null)
-    let priceValue = 0
-
-    if (price) {
-      price = price.trim().replace(/[^\d]/g, '')
-      priceValue = Number(price)
-    } else {
-      const altPriceEl = item.locator('span[style*="color: rgb(62, 64, 66)"]').first()
-      let altPrice: string | null = await altPriceEl.innerText({ timeout: 5000 }).catch(() => null)
-      if (altPrice) {
-        altPrice = altPrice.trim().replace(/[^\d]/g, '')
-        priceValue = Number(altPrice)
-      }
+    if (link && ref && !linksSeen.has(ref)) {
+      links.push(link!)
+      linksSeen.add(ref)
     }
+  }
 
-    // ENDEREÇO (Barra De Ibiraquera, Imbituba - SC)
-    const addressEl = item.locator('.CardImoveisVitrine_location__9c96p span').first()
-    let address: string | null = await addressEl.textContent().catch(() => null)
-    if (address) address = address.trim()
+  const listingPromises = links.map(async (link) => {
+    const fullLink = new URL(link, baseUrl).toString()
+    try {
+      const cardLocator = page.locator(`${LISTING_ITEM_SELECTOR}:has(a[href="${link}"])`).first()
 
-    const typeEl = item.locator('.CardImoveisVitrine_headContent__J9iqi h4').first()
-    let type: string | null = await typeEl.textContent().catch(() => null)
-    if (type) {
-      type = type.trim()
+      // PREÇO
+      const priceEl = cardLocator.locator('span[style*="color: rgb(106, 161, 86)"]').first()
+      let price: string | null = await priceEl.innerText({ timeout: 3000 }).catch(() => null)
+      let priceValue = 0
 
-      if (type.includes('Apartamento')) {
-        type = 'Apartamento'
+      if (price) {
+        price = price.trim().replace(/[^\d]/g, '')
+        priceValue = Number(price)
+      } else {
+        const altPriceEl = cardLocator.locator('span[style*="color: rgb(62, 64, 66)"]').first()
+        const altPrice = await altPriceEl.innerText({ timeout: 3000 }).catch(() => null)
+        if (altPrice) {
+          priceValue = Number(altPrice.trim().replace(/[^\d]/g, ''))
+        }
       }
 
-      if (type.includes('Casa')) {
-        type = 'Casa'
+      // ENDEREÇO
+      const addressEl = cardLocator.locator('[class*="__location"] div span').first()
+      let address = await addressEl.textContent({ timeout: 2000 }).catch(() => null)
+      if (address) address = address.trim()
+
+      // TIPO
+      const typeEl = cardLocator.locator('[class*="__headContent"] h4').first()
+      let type = await typeEl.textContent({ timeout: 2000 }).catch(() => null)
+      if (type) {
+        type = type.trim()
+        if (type.includes('Apartamento')) type = 'Apartamento'
+        else if (type.includes('Casa')) type = 'Casa'
+        else if (type.includes('Terreno')) type = 'Terreno'
       }
 
-      if (type.includes('Terreno')) {
-        type = 'Terreno'
-      }
-    }
-
-    // ÁREA (300m²)
-    const areaEl = item.locator('img[alt="Metragem"] + span').first()
-    let areaText: string | null = await areaEl.textContent().catch(() => null)
-    let area: number | null = null
-    if (areaText) {
-      areaText = areaText.trim()
-      if (!areaText.includes('0m²')) {
-        const match = areaText.replace(/\D/g, '')
+      // ÁREA
+      const areaEl = cardLocator
+        .locator('[class*="__details"] div div')
+        .nth(1)
+        .locator('span')
+        .first()
+      const areaText = await areaEl.textContent({ timeout: 2000 }).catch(() => null)
+      let area: number | null = null
+      if (areaText && !areaText.includes('0m²')) {
+        const match = areaText.trim().replace(/\D/g, '')
         area = match ? Number(match) : null
       }
-    }
 
-    // QUARTOS (4)
-    const bedroomsEl = item.locator('img[alt="Quartos"] + span').first()
-    const bedroomsText = await bedroomsEl.textContent().catch(() => null)
-    const bedrooms = bedroomsText ? Number(bedroomsText.trim()) || null : null
+      // QUARTOS
+      const bedroomsEl = cardLocator
+        .locator('[class*="__details"] div div + div')
+        .nth(1)
+        .locator('span')
+        .first()
+      const bedroomsText = await bedroomsEl.textContent({ timeout: 2000 }).catch(() => null)
+      const bedrooms = bedroomsText ? Number(bedroomsText.trim()) || null : null
 
-    // BANHEIROS (3)
-    const bathroomsEl = item.locator('img[alt="Banheiros"] + span').first()
-    const bathroomsText = await bathroomsEl.textContent().catch(() => null)
-    const bathrooms = bathroomsText ? Number(bathroomsText.trim()) || null : null
+      // BANHEIROS
+      const bathroomsEl = cardLocator
+        .locator('[class*="__details"] div div + div + div span')
+        .first()
+      const bathroomsText = await bathroomsEl.textContent({ timeout: 2000 }).catch(() => null)
+      const bathrooms = bathroomsText ? Number(bathroomsText.trim()) || null : null
 
-    // VAGAS (3)
-    const parkingEl = item.locator('img[alt="Garagens"] + span').first()
-    const parkingText = await parkingEl.textContent().catch(() => null)
-    const parking = parkingText ? Number(parkingText.trim()) || null : null
+      // VAGAS
+      const parkingEl = cardLocator
+        .locator('[class*="__details"] div div + div + div + div span')
+        .first()
+      const parkingText = await parkingEl.textContent({ timeout: 2000 }).catch(() => null)
+      const parking = parkingText ? Number(parkingText.trim()) || null : null
 
-    // REFERÊNCIA (ref: 759737)
-    const refEl = item
-      .locator('.CardImoveisVitrine_cardImovelFooter__ef_ha span:has-text("ref:")')
-      .first()
-    let reference: string | null = await refEl.textContent().catch(() => null)
-    if (reference) reference = reference.replace('ref:', '').trim()
+      // REFERÊNCIA
+      const refEl = cardLocator
+        .locator('[class*="__cardImovelFooter"] div div span.text-xs')
+        .first()
+      let reference = await refEl.textContent({ timeout: 2000 }).catch(() => null)
+      if (reference) reference = reference.replace('ref:', '').trim()
 
-    // Navigate to detail page to get content and photos
-    let content: string | null = null
-    let photos: string[] = []
-
-    if (link) {
-      const fullLink = new URL(link, baseUrl).toString()
-
-      try {
-        const detailPage = await page.context().newPage()
-
-        await detailPage.goto(fullLink, { waitUntil: 'load' })
-
-        // Extract description content
-        const descriptionEl = detailPage.locator(
-          'section.section-sobre-detalhe #descricao div.half-text-hidden'
-        )
-        content = await descriptionEl.innerText().catch(() => {
-          console.log('Content fails to load')
-          return null
-        })
-        if (content) {
-          content = content.trim()
-        }
-
-        // Extract all photo URLs from the modal
-        const photoElements = await detailPage.$$eval(
-          'dialog.mosaico-container li.item-mosaico img',
-          (els) => els.map((el) => el.getAttribute('src'))
-        )
-
-        const photoCount = photoElements.length
-
-        for (let j = 0; j < photoCount; j++) {
-          const photoSrc = photoElements[j]
-
-          if (photoSrc) {
-            photos.push(photoSrc)
-          }
-        }
-
-        await detailPage.close({ reason: 'normal' })
-      } catch (err) {
-        logger.error(`Error scraping detail page ${fullLink}:`, err)
+      return {
+        name: null,
+        link: fullLink,
+        image: null,
+        address,
+        price: priceValue,
+        area,
+        bedrooms,
+        type,
+        forSale: true,
+        parking,
+        content: '',
+        photos: null,
+        agency: 'Auxiliadora Predial',
+        bathrooms,
+        ref: reference,
+        placeholderImage: null,
+        agentId: null,
+        published: false,
+        fullLink,
       }
-    }
-
-    return {
-      name: null,
-      link: link ? new URL(link, baseUrl).toString() : null,
-      image: null,
-      address,
-      price: priceValue,
-      area,
-      bedrooms,
-      type,
-      forSale: true,
-      parking,
-      content,
-      photos: photos.length > 0 ? JSON.stringify(photos) : null,
-      agency: 'Auxiliadora Predial',
-      bathrooms,
-      ref: reference,
-      placeholderImage: null,
-      agentId: null,
-      published: false,
+    } catch (err: any) {
+      logger.error(`Error scraping link ${link}: ${err.message || err.toString()}`)
+      return null
     }
   })
 
-  const listings = await Promise.all(listingPromises)
+  const listings = (await Promise.all(listingPromises)).filter((l) => l !== null)
 
-  return listings
+  return listings as ScrapedListing[]
 }

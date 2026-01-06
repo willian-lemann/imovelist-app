@@ -13,8 +13,8 @@ type QuickFiltersProps = {
   filters?: Record<string, string>
 }
 
-export function QuickFilters({ filters = {} }: QuickFiltersProps) {
-  const searchParams = new URLSearchParams(filters)
+export function QuickFilters() {
+  const searchParams = new URLSearchParams(window.location.search)
   const [quickFilters, setQuickFilters] = useState<{
     [key: string]: QuickFilter
   }>({})
@@ -108,7 +108,7 @@ export function QuickFilters({ filters = {} }: QuickFiltersProps) {
     }
 
     setQuickFilters(newFilters)
-  }, [filters])
+  }, [window.location.search])
 
   if (!hasFilters) {
     return null

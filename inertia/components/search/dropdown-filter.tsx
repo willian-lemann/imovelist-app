@@ -46,7 +46,7 @@ export function DropdownFilter({
           <DropdownMenuCheckboxItem
             checked={currentFilter === filter.value}
             key={filter.value}
-            className="flex-1/2"
+            className=" px-2"
             onMouseOver={() => handlePrefetchFilter(filter.value)}
             onClick={() => onFilter(filter.value)}
           >

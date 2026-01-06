@@ -1,5 +1,5 @@
-import { ChevronLeft, Upload, X } from 'lucide-react'
-import { useEffect, useState, useRef } from 'react'
+import { ChevronLeft } from 'lucide-react'
+import { useEffect } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -56,9 +56,6 @@ export function ListingForm({ listingId, onCancel, onSuccess }: ListingFormProps
   const createMutation = useCreateListing()
   const updateMutation = useUpdateListing()
 
-  const [previewImages, setPreviewImages] = useState<string[]>([])
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
   const {
     register,
     handleSubmit,
@@ -99,52 +96,16 @@ export function ListingForm({ listingId, onCancel, onSuccess }: ListingFormProps
         content: listing.content ?? '',
         ref: listing.ref ?? '',
       })
-      // Set existing photos as previews
-      if (listing.photos && listing.photos.length > 0) {
-        setPreviewImages(listing.photos)
-      }
     }
   }, [isEditing, listing, reset])
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files
-    if (!files) return
-
-    const fileArray = Array.from(files)
-
-    const readers = fileArray.map(
-      (file) =>
-        new Promise<string>((resolve, reject) => {
-          const reader = new FileReader()
-          reader.onload = (e) => resolve(e.target?.result as string)
-          reader.onerror = reject
-          reader.readAsDataURL(file)
-        })
-    )
-
-    Promise.all(readers).then((images) => {
-      setPreviewImages((prev) => [...prev, ...images])
-    })
-
-    event.target.value = ''
-  }
-
-  const handleRemoveImage = (index: number) => {
-    setPreviewImages((prev) => prev.filter((_, i) => i !== index))
-  }
-
   const onSubmit = async (data: ListingFormData) => {
     try {
-      const payload = {
-        ...data,
-        photos: previewImages.length > 0 ? previewImages : undefined,
-      }
-
       if (isEditing && listingId) {
-        await updateMutation.mutateAsync({ id: listingId, ...payload })
+        await updateMutation.mutateAsync({ id: listingId, ...data })
         toast.success('Anúncio atualizado com sucesso!')
       } else {
-        await createMutation.mutateAsync(payload)
+        await createMutation.mutateAsync(data)
         toast.success('Anúncio criado com sucesso!')
       }
       onSuccess()
@@ -319,50 +280,33 @@ export function ListingForm({ listingId, onCancel, onSuccess }: ListingFormProps
           </CardContent>
         </Card>
 
-        {/* Photos */}
+        {/* Photos Info */}
         <Card>
           <CardHeader>
             <CardTitle>Fotos</CardTitle>
-            <CardDescription>Adicione fotos do imóvel</CardDescription>
+            <CardDescription>Gerencie as fotos do imóvel</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div
-              className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 transition-colors"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-              <p className="text-sm text-gray-600">Clique para adicionar fotos</p>
-              <p className="text-xs text-gray-400 mt-1">PNG, JPG até 10MB</p>
+          <CardContent>
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+              <p className="text-sm text-blue-800">
+                {isEditing ? (
+                  <>
+                    <strong>Dica:</strong> Para adicionar ou remover fotos deste imóvel, utilize a
+                    seção <strong>"Galeria"</strong> no menu lateral após salvar as alterações.
+                  </>
+                ) : (
+                  <>
+                    <strong>Dica:</strong> Após criar o anúncio, você poderá adicionar fotos através
+                    da seção <strong>"Galeria"</strong> no menu lateral.
+                  </>
+                )}
+              </p>
+              {isEditing && listing?.photos && listing.photos.length > 0 && (
+                <p className="text-sm text-blue-700 mt-2">
+                  Este imóvel possui {listing.photos.length} foto(s) cadastrada(s).
+                </p>
+              )}
             </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleImageUpload}
-              className="hidden"
-            />
-
-            {previewImages.length > 0 && (
-              <div className="grid grid-cols-3 gap-2">
-                {previewImages.map((src, index) => (
-                  <div key={index} className="relative group">
-                    <img
-                      src={src}
-                      alt={`Preview ${index + 1}`}
-                      className="w-full h-20 object-cover rounded-md"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveImage(index)}
-                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
           </CardContent>
         </Card>
       </div>

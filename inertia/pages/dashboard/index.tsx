@@ -42,24 +42,22 @@ export default function Dashboard() {
   }
 
   const renderContent = () => {
-    switch (activeTab) {
-      case tabMap.LISTINGS:
-        return <ListingsSection onEdit={handleEditListing} onCreateNew={handleCreateNew} />
-      case tabMap.CREATE_LISTING:
-        return (
-          <ListingForm
-            listingId={editingListingId}
-            onCancel={() => setActiveTab(tabMap.LISTINGS)}
-            onSuccess={handleFormSuccess}
-          />
-        )
-      case tabMap.GALLERY:
-        return <GallerySection isPremium={isPremium} />
-      case tabMap.AI_PAGE_GENERATOR:
-        return <AiPageGenerator isPremium={isPremium} />
-      default:
-        return null
+    const tabContentMap = {
+      [tabMap.LISTINGS]: (
+        <ListingsSection onEdit={handleEditListing} onCreateNew={handleCreateNew} />
+      ),
+      [tabMap.CREATE_LISTING]: (
+        <ListingForm
+          listingId={editingListingId}
+          onCancel={() => setActiveTab(tabMap.LISTINGS)}
+          onSuccess={handleFormSuccess}
+        />
+      ),
+      [tabMap.GALLERY]: <GallerySection isPremium={isPremium} />,
+      [tabMap.AI_PAGE_GENERATOR]: <AiPageGenerator isPremium={isPremium} />,
     }
+
+    return tabContentMap[activeTab] ?? null
   }
 
   return (

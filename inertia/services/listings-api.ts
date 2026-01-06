@@ -8,9 +8,6 @@ import type {
 } from '~/types/listing'
 
 export const listingsApi = {
-  /**
-   * Fetch paginated listings with filters
-   */
   async getListings(filters: ListingsFilters = {}): Promise<ListingsResponse> {
     const params = new URLSearchParams()
 
@@ -23,6 +20,7 @@ export const listingsApi = {
     if (filters.price_range) params.set('price_range', filters.price_range)
     if (filters.area_range) params.set('area_range', filters.area_range)
     if (filters.page) params.set('page', String(filters.page))
+    if (filters.userId) params.set('userId', String(filters.userId))
 
     const { data } = await apiClient.get<ListingsResponse>(`/listings?${params.toString()}`)
     return data
@@ -57,5 +55,10 @@ export const listingsApi = {
    */
   async deleteListing(id: number): Promise<void> {
     await apiClient.delete(`/listings/${id}`)
+  },
+
+  async getGroupTypes(): Promise<string[]> {
+    const { data } = await apiClient.get<string[]>('/group-types')
+    return data
   },
 }
