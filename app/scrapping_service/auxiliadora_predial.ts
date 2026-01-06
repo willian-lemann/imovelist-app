@@ -2,6 +2,7 @@ import { chromium, Browser, Page } from 'playwright'
 import logger from '@adonisjs/core/services/logger'
 import Listing from '#models/listing'
 import ScrappedInfo from '#models/scrapped_info'
+import env from '#start/env'
 
 interface ScrapedListing {
   id?: number
@@ -100,7 +101,7 @@ export async function auxiliadoraPredialScrape() {
   const mappedDetailsScraped = new Map<string, { content: string; photos: string | null }>()
 
   logger.info('Starting detailed scraping for each listing...')
-  await fetch('http://localhost:3000/scrape', {
+  await fetch(`${env.get('SCRAPING_SERVICE_URL')}/scrape`, {
     body: JSON.stringify({
       URLs: allListings.map((listing) => listing.fullLink!),
     }),

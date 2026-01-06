@@ -47,4 +47,11 @@ export default await Env.create(new URL('../', import.meta.url), {
   S3_SECRET_ACCESS_KEY: Env.schema.string(),
   S3_BUCKET: Env.schema.string.optional(),
   S3_PUBLIC_URL: Env.schema.string.optional(),
+
+  /*
+  |----------------------------------------------------------
+  | Variables for configuring scraping service
+  |----------------------------------------------------------
+  */
+  SCRAPING_SERVICE_URL: Env.schema.string({ format: 'url' }),
 })
