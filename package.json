@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
-    "poststart": "node ace scrape:listings"
+    "poststart": "node ace scheduler:run"
   },
   "imports": {
     "#controllers/*": "./app/controllers/*.js",
