@@ -3,6 +3,7 @@ import logger from '@adonisjs/core/services/logger'
 import Listing from '#models/listing'
 import ScrappedInfo from '#models/scrapped_info'
 import env from '#start/env'
+import { scrapingService } from '#services/scraping_service'
 
 interface ScrapedListing {
   id?: number
@@ -101,25 +102,34 @@ export async function auxiliadoraPredialScrape() {
   const mappedDetailsScraped = new Map<string, { content: string; photos: string | null }>()
 
   logger.info('Starting detailed scraping for each listing...')
-  await fetch(`${env.get('SCRAPING_SERVICE_URL')}/scrape`, {
-    body: JSON.stringify({
-      URLs: allListings.map((listing) => listing.fullLink!),
-    }),
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-  }).then(async (res) => {
-    const data = (await res.json()) as {
-      results: Array<{ photos: string[]; content: string; url: string; ref: string }>
-    }
 
-    data.results.forEach(({ photos, content, ref }) => {
-      mappedDetailsScraped.set(ref, {
-        content: content || '',
-        photos: photos.length > 0 ? JSON.stringify(photos) : null,
-      })
-    })
-    logger.info('Detailed scraping completed.')
+  const data = await scrapingService({
+    URLs: allListings.map((l) => l.fullLink!).filter((l) => l !== null),
+    selectors: {
+      content: [
+        'section.section-sobre-detalhe #descricao div.half-text-hidden',
+        'section.section-sobre-detalhe #descricao',
+        '[class*="descricao"]',
+        '[class*="description"]',
+      ],
+      photos: [
+        'dialog.mosaico-container li.item-mosaico img',
+        '[class*="mosaico"] img',
+        '[class*="gallery"] img',
+        'img[src*="imovel"]',
+      ],
+    },
   })
+
+  logger.info('Detailed scraping completed.')
+
+  data.results.forEach(({ photos, content, ref }) => {
+    mappedDetailsScraped.set(ref, {
+      content: content || '',
+      photos: photos.length > 0 ? JSON.stringify(photos) : null,
+    })
+  })
+
   await browser.close()
 
   allListings.forEach((listing) => {

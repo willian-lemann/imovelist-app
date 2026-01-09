@@ -53,5 +53,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   | Variables for configuring scraping service
   |----------------------------------------------------------
   */
-  SCRAPING_SERVICE_URL: Env.schema.string({ format: 'url' }),
+  SCRAPING_SERVICE_URL: Env.schema.string({
+    format: process.env.NODE_ENV === 'production' ? 'url' : undefined,
+  }),
 })
