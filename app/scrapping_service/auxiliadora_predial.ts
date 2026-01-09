@@ -2,7 +2,7 @@ import { chromium, Browser, Page } from 'playwright'
 import logger from '@adonisjs/core/services/logger'
 import Listing from '#models/listing'
 import ScrappedInfo from '#models/scrapped_info'
-import env from '#start/env'
+
 import { scrapingService } from '#services/scraping_service'
 
 interface ScrapedListing {
