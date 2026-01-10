@@ -1,9 +1,5 @@
 import env from '#start/env'
 
-type ScrapeResponse = {
-  results: Array<{ photos: string[]; content: string; url: string; ref: string }>
-}
-
 type Params = {
   URLs: string[]
   selectors: {
