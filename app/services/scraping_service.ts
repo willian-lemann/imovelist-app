@@ -12,7 +12,7 @@ type Params = {
   }
 }
 export async function scrapingService({ URLs, selectors }: Params) {
-  const response = await fetch(`${env.get('SCRAPING_SERVICE_URL')}/scrape`, {
+  await fetch(`${env.get('SCRAPING_SERVICE_URL')}/scrape`, {
     body: JSON.stringify({
       URLs,
       selectors,
@@ -20,7 +20,4 @@ export async function scrapingService({ URLs, selectors }: Params) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
   })
-
-  const data = (await response.json()) as ScrapeResponse
-  return data
 }

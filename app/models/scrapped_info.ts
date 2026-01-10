@@ -14,6 +14,9 @@ export default class ScrappedInfo extends BaseModel {
   @column()
   declare agency: string
 
+  @column()
+  declare links_failed: string[]
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

@@ -99,46 +99,7 @@ export async function auxiliadoraPredialScrape() {
 
   logger.info(`Scraped ${allListings.length} unique listings`)
 
-  const mappedDetailsScraped = new Map<string, { content: string; photos: string | null }>()
-
-  logger.info('Starting detailed scraping for each listing...')
-
-  const data = await scrapingService({
-    URLs: allListings.map((l) => l.fullLink!).filter((l) => l !== null),
-    selectors: {
-      content: [
-        'section.section-sobre-detalhe #descricao div.half-text-hidden',
-        'section.section-sobre-detalhe #descricao',
-        '[class*="descricao"]',
-        '[class*="description"]',
-      ],
-      photos: [
-        'dialog.mosaico-container li.item-mosaico img',
-        '[class*="mosaico"] img',
-        '[class*="gallery"] img',
-        'img[src*="imovel"]',
-      ],
-    },
-  })
-
-  logger.info('Detailed scraping completed.')
-
-  data.results.forEach(({ photos, content, ref }) => {
-    mappedDetailsScraped.set(ref, {
-      content: content || '',
-      photos: photos.length > 0 ? JSON.stringify(photos) : null,
-    })
-  })
-
   await browser.close()
-
-  allListings.forEach((listing) => {
-    const details = mappedDetailsScraped.get(listing.ref!)
-    if (details) {
-      listing.content = details.content
-      listing.photos = details.photos
-    }
-  })
 
   logger.info(`Scraping finalizado! Total de ${allListings.length} imóveis únicos coletados.`)
 
@@ -158,6 +119,26 @@ export async function auxiliadoraPredialScrape() {
   await Listing.createManyQuietly(listingsForDb)
 
   logger.info(`Database updated with ${allListings.length} listings`)
+
+  logger.info('Sent to scraping details background.')
+
+  await scrapingService({
+    URLs: allListings.map((l) => l.fullLink!).filter((l) => l !== null),
+    selectors: {
+      content: [
+        'section.section-sobre-detalhe #descricao div.half-text-hidden',
+        'section.section-sobre-detalhe #descricao',
+        '[class*="descricao"]',
+        '[class*="description"]',
+      ],
+      photos: [
+        'dialog.mosaico-container li.item-mosaico img',
+        '[class*="mosaico"] img',
+        '[class*="gallery"] img',
+        'img[src*="imovel"]',
+      ],
+    },
+  })
 }
 
 async function scrapeCurrentPage(page: Page, baseUrl: string): Promise<ScrapedListing[]> {
