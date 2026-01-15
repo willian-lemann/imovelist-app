@@ -48,7 +48,7 @@ export default class Listing extends BaseModel {
   declare content: string | null
 
   @column()
-  declare photos: any | null
+  declare photos: string[] | null
 
   @column()
   declare agency: string | null

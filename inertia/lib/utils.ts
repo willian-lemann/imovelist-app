@@ -14,11 +14,12 @@ export function cn(...inputs: ClassValue[]): string {
 export function formatMoney(money: string | number) {
   const formatter = new Intl.NumberFormat('pt-BR', {
     style: 'currency',
-    maximumFractionDigits: 2,
     currency: 'BRL',
   })
 
-  return formatter.format(Number(money))
+  const cents = Number(money)
+  money = Number.isNaN(cents) ? 0 : cents / 100
+  return formatter.format(+Number(money).toFixed(2))
 }
 
 export function createSlug(propertyName: string) {

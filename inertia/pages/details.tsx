@@ -191,7 +191,7 @@ export default function Details({ listing }: ListingDetailsProps) {
                     </div>
 
                     <Button className="w-full " onClick={handleGoToSite}>
-                      {listing.agent_id ? 'Falar com corretor' : 'Falar com imobiliaria'}
+                      {listing.agentId ? 'Falar com corretor' : 'Falar com imobiliaria'}
                     </Button>
                   </CardContent>
                 </Card>

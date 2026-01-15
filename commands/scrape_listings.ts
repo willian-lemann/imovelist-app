@@ -5,6 +5,7 @@ import { auxiliadoraPredialScrape } from '../app/scrapping_service/auxiliadora_p
 import { CommandOptions } from '@adonisjs/core/types/ace'
 import ScrappedListing from '#models/scrapped_listing'
 import Listing from '#models/listing'
+import { jefersonAlba } from '../app/scrapping_service/jeferson_alba.js'
 
 export default class ScrapeListingsCommand extends BaseCommand {
   static commandName = 'scrape:listings'
@@ -23,6 +24,7 @@ export default class ScrapeListingsCommand extends BaseCommand {
       await Listing.query().whereNull('name').delete()
 
       await auxiliadoraPredialScrape()
+      await jefersonAlba()
     } catch (error) {
       this.logger.error('Scraping failed:', error)
       throw error // Re-throw to mark command as failed

@@ -7,7 +7,6 @@ export default class DashboardController {
 
     return inertia.render('dashboard/index', {
       isPremium,
-      isAuthenticated: auth.isAuthenticated,
       currentUser: auth.user ? auth.user.serialize() : null,
     })
   }

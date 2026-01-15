@@ -28,12 +28,11 @@ interface ScrapedListing {
   fullLink?: string | null
 }
 
-const LISTING_ITEM_SELECTOR = '[class*="CardImoveisVitrine"]'
-const LISTING_ITEM_SELECTOR_CARD = '[class*="CardImoveisVitrine-module"][class*="container"]'
+const LISTING_ITEM_SELECTOR = '[class*="col-imovel"]'
+const LISTING_ITEM_SELECTOR_CARD = '[class*="col-imovel"]'
 
-export async function auxiliadoraPredialScrape() {
-  logger.info(`Auxiliadora Predial...`)
-
+export async function jefersonAlba() {
+  logger.info('Jeferson Alba...')
   const browser: Browser = await chromium.launch({
     headless: true,
     args: ['--disable-dev-shm-usage', '--no-sandbox'],
@@ -47,7 +46,7 @@ export async function auxiliadoraPredialScrape() {
       'Chrome/120.0 Safari/537.36',
   })
 
-  const baseUrl = 'https://www.auxiliadorapredial.com.br/comprar/residencial/sc+imbituba'
+  const baseUrl = 'https://imobiliariajefersonealba.com.br/vendas/imoveis'
   const allListings: ScrapedListing[] = []
 
   // 1. Discover total pages
@@ -55,25 +54,28 @@ export async function auxiliadoraPredialScrape() {
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded' })
   await page.waitForSelector(LISTING_ITEM_SELECTOR, { timeout: 15000 })
 
-  const paginationButtons = page.locator('button[aria-label^="Go to page"]')
-  const buttonCount = await paginationButtons.count()
+  // Find the "Última" button and click it to get the last page number
+  const ultimaButton = page.locator('a.page-link[aria-label="Última"]').first()
   let totalPages = 1
 
-  for (let i = 0; i < buttonCount; i++) {
-    const btnText = await paginationButtons.nth(i).textContent()
-    const pageNum = Number.parseInt(btnText!)
-    if (!Number.isNaN(pageNum) && pageNum > totalPages) {
-      totalPages = pageNum
+  if (await ultimaButton.count()) {
+    await ultimaButton.click()
+    await page.waitForLoadState('domcontentloaded')
+    // After navigation, get the active page number
+    const activePage = page.locator('li.page-item.active a.page-link').first()
+    const activePageNum = await activePage.textContent()
+    if (activePageNum) {
+      totalPages = Number.parseInt(activePageNum.trim())
     }
+    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' })
   }
 
   await page.close()
 
   logger.info(`Total pages found: ${totalPages}`)
 
-  // 2. Scrape listing pages with controlled concurrency
   const pageUrls = Array.from({ length: totalPages }, (_, i) =>
-    i === 0 ? baseUrl : `${baseUrl}?page=${i + 1}`
+    i === 0 ? baseUrl : `${baseUrl}/${i + 1}`
   )
 
   logger.info(`Scraping...`)
@@ -82,11 +84,14 @@ export async function auxiliadoraPredialScrape() {
     const url = pageUrls[i]
 
     const pageInstance = await context.newPage()
+
     try {
       await pageInstance.goto(url, {
         waitUntil: 'load',
       })
+
       await pageInstance.waitForSelector(LISTING_ITEM_SELECTOR, { timeout: 5000 })
+
       const scrapedListings = await scrapeCurrentPage(pageInstance, baseUrl)
 
       scrapedListings.forEach((listing) => {
@@ -104,7 +109,7 @@ export async function auxiliadoraPredialScrape() {
 
   await browser.close()
 
-  logger.info(`Scraping finalizado! Total de ${allListings.length} imóveis únicos coletados.`)
+  logger.info(`Scraping finished ${allListings.length} unique listings collected.`)
 
   const listingsForDb = allListings.map(({ fullLink, ...listing }) => ({
     ...listing,
@@ -113,7 +118,7 @@ export async function auxiliadoraPredialScrape() {
   logger.info('Saving in database...')
 
   await ScrappedInfo.create({
-    agency: 'Auxiliadora Predial',
+    agency: 'Jeferson Alba',
     total_listings: allListings.length,
     total_pages: totalPages,
   })
@@ -121,48 +126,36 @@ export async function auxiliadoraPredialScrape() {
   await Listing.createManyQuietly(listingsForDb)
 
   logger.info(`Database updated with ${allListings.length} listings`)
-
   logger.info('Sent to scraping details background.')
 
   await scrapingService({
-    name: 'Auxiliadora Predial',
+    name: 'Jeferson Alba',
     URLs: allListings.map((l) => l.fullLink!).filter((l) => l !== null),
     selectors: {
-      ref: '/venda/(\\d+)/',
-      content: [
-        'section.section-sobre-detalhe #descricao div.half-text-hidden',
-        'section.section-sobre-detalhe #descricao',
-        '[class*="descricao"]',
-        '[class*="description"]',
-      ],
-      photos: [
-        'dialog.mosaico-container li.item-mosaico img',
-        '[class*="mosaico"] img',
-        '[class*="gallery"] img',
-        'img[src*="imovel"]',
-      ],
+      ref: '/ver/(\\d+)/',
+      content: ['.imovel-content-section'],
+      photos: ['.tab-content #imovel-fotos .container .img-gallery-magnific .magnific-img a img'],
     },
   })
 }
 
 async function scrapeCurrentPage(page: Page, baseUrl: string): Promise<ScrapedListing[]> {
-  await page.waitForSelector(`${LISTING_ITEM_SELECTOR} a[target="_blank"][href^="/imovel/"]`, {
+  await page.waitForSelector(`${LISTING_ITEM_SELECTOR}`, {
     timeout: 5000,
   })
 
-  const visibleLinks = page.locator(
-    `${LISTING_ITEM_SELECTOR_CARD} a[target="_blank"][href^="/imovel/"]`
-  )
+  const visibleLinks = page.locator(LISTING_ITEM_SELECTOR_CARD)
 
   const linkCount = await visibleLinks.count()
+
   const links: string[] = []
   const linksSeen = new Set<string>()
 
   for (let i = 0; i < linkCount; i++) {
-    const link = await visibleLinks.nth(i).getAttribute('href')
+    const link = await visibleLinks.nth(i).locator('a').getAttribute('href')
 
     // get the ref from each link regex
-    const refMatch = link?.match(/\/venda\/([^\/?#]+)/)
+    const refMatch = link?.match(/\/ver\/([^\/?#]+)/)
     const ref = refMatch ? refMatch[1] : null
 
     if (link && ref && !linksSeen.has(ref)) {
@@ -177,28 +170,27 @@ async function scrapeCurrentPage(page: Page, baseUrl: string): Promise<ScrapedLi
       const cardLocator = page.locator(`${LISTING_ITEM_SELECTOR}:has(a[href="${link}"])`).first()
 
       // PREÇO
-      const priceEl = cardLocator.locator('span[style*="color: rgb(106, 161, 86)"]').first()
+      // PREÇO
+      const priceEl = cardLocator.locator('span.--price').first()
+      await priceEl.evaluate((el: any) => {
+        const off = el.querySelector('small.--off')
+        if (off) off.remove()
+      })
       let price: string | null = await priceEl.innerText({ timeout: 3000 }).catch(() => null)
       let priceValue = 0
 
       if (price) {
         price = price.trim().replace(/[^\d]/g, '')
         priceValue = Number(price)
-      } else {
-        const altPriceEl = cardLocator.locator('span[style*="color: rgb(62, 64, 66)"]').first()
-        const altPrice = await altPriceEl.innerText({ timeout: 3000 }).catch(() => null)
-        if (altPrice) {
-          priceValue = Number(altPrice.trim().replace(/[^\d]/g, ''))
-        }
       }
 
       // ENDEREÇO
-      const addressEl = cardLocator.locator('[class*="__location"] div span').first()
+      const addressEl = cardLocator.locator('span.--location').first()
       let address = await addressEl.textContent({ timeout: 2000 }).catch(() => null)
       if (address) address = address.trim()
 
       // TIPO
-      const typeEl = cardLocator.locator('[class*="__headContent"] h4').first()
+      const typeEl = cardLocator.locator('span.--type').first()
       let type = await typeEl.textContent({ timeout: 2000 }).catch(() => null)
       if (type) {
         type = type.trim()
@@ -209,9 +201,9 @@ async function scrapeCurrentPage(page: Page, baseUrl: string): Promise<ScrapedLi
 
       // ÁREA
       const areaEl = cardLocator
-        .locator('[class*="__details"] div div')
-        .nth(1)
-        .locator('span')
+        .locator('ul.box-imovel-items.--lg li.--item')
+        .nth(3)
+        .locator('strong')
         .first()
       const areaText = await areaEl.textContent({ timeout: 2000 }).catch(() => null)
       let area: number | null = null
@@ -222,33 +214,32 @@ async function scrapeCurrentPage(page: Page, baseUrl: string): Promise<ScrapedLi
 
       // QUARTOS
       const bedroomsEl = cardLocator
-        .locator('[class*="__details"] div div + div')
-        .nth(1)
-        .locator('span')
+        .locator('ul.box-imovel-items.--lg li.--item')
+        .nth(0)
+        .locator('strong')
         .first()
       const bedroomsText = await bedroomsEl.textContent({ timeout: 2000 }).catch(() => null)
-      const bedrooms = bedroomsText ? Number(bedroomsText.trim()) || null : null
+
+      const bedrooms = Number(bedroomsText!.trim())
 
       // BANHEIROS
-      const bathroomsEl = cardLocator
-        .locator('[class*="__details"] div div + div + div span')
-        .first()
+      const bathroomsEl = cardLocator.locator('ul.box-imovel-items.--lg li.--item strong').nth(1)
       const bathroomsText = await bathroomsEl.textContent({ timeout: 2000 }).catch(() => null)
-      const bathrooms = bathroomsText ? Number(bathroomsText.trim()) || null : null
+      const bathrooms = Number(bathroomsText!.trim())
 
       // VAGAS
       const parkingEl = cardLocator
-        .locator('[class*="__details"] div div + div + div + div span')
+        .locator('ul.box-imovel-items.--lg li.--item')
+        .nth(2)
+        .locator('strong')
         .first()
       const parkingText = await parkingEl.textContent({ timeout: 2000 }).catch(() => null)
-      const parking = parkingText ? Number(parkingText.trim()) || null : null
+      const parking = Number(parkingText!.trim())
 
       // REFERÊNCIA
-      const refEl = cardLocator
-        .locator('[class*="__cardImovelFooter"] div div span.text-xs')
-        .first()
+      const refEl = cardLocator.locator('span.--code').first()
       let reference = await refEl.textContent({ timeout: 2000 }).catch(() => null)
-      if (reference) reference = reference.replace('ref:', '').trim()
+      if (reference) reference = reference.replace('Cód.', '').trim()
 
       return {
         name: null,
@@ -263,7 +254,7 @@ async function scrapeCurrentPage(page: Page, baseUrl: string): Promise<ScrapedLi
         parking,
         content: '',
         photos: null,
-        agency: 'Auxiliadora Predial',
+        agency: 'Jeferson Alba',
         bathrooms,
         ref: reference,
         placeholderImage: null,
