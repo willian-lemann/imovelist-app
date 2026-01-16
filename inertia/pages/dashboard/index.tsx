@@ -9,20 +9,27 @@ import { ListingsSection } from './listings-section'
 import { ListingForm } from './listing-form'
 import { GallerySection } from './gallery-section'
 import { AiPageGenerator } from './ai-page-generator'
+import { DashboardHome } from './dashboard-home'
+import { Profile } from './profile'
 
 type PageProps = {
   user?: {
     id: number
     email: string
     fullName: string | null
+    profilePhoto?: string | null
+    whatsapp?: string | null
+    profileUrl?: string | null
+    logo?: string | null
   } | null
   isPremium?: boolean
+  listingsCount?: number
 }
 
 export default function Dashboard() {
-  const { user, isPremium = false } = usePage<PageProps>().props
+  const { user, isPremium = false, listingsCount = 0 } = usePage<PageProps>().props
 
-  const [activeTab, setActiveTab] = useState(tabMap.LISTINGS)
+  const [activeTab, setActiveTab] = useState(tabMap.DASHBOARD)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [editingListingId, setEditingListingId] = useState<number | null>(null)
 
@@ -43,16 +50,26 @@ export default function Dashboard() {
 
   const renderContent = () => {
     const tabContentMap = {
+      [tabMap.DASHBOARD]: (
+        <DashboardHome
+          userName={user?.fullName || 'Usuário'}
+          listingsCount={listingsCount}
+          plan={isPremium ? 'Premium' : 'Gratuito'}
+          isPremium={isPremium}
+          onCreateListing={handleCreateNew}
+        />
+      ),
       [tabMap.LISTINGS]: (
         <ListingsSection onEdit={handleEditListing} onCreateNew={handleCreateNew} />
       ),
       [tabMap.CREATE_LISTING]: (
         <ListingForm
           listingId={editingListingId}
-          onCancel={() => setActiveTab(tabMap.LISTINGS)}
+          onCancel={() => setActiveTab(tabMap.DASHBOARD)}
           onSuccess={handleFormSuccess}
         />
       ),
+      [tabMap.PROFILE]: <Profile user={user ?? undefined} />,
       [tabMap.GALLERY]: <GallerySection isPremium={isPremium} />,
       [tabMap.AI_PAGE_GENERATOR]: <AiPageGenerator isPremium={isPremium} />,
     }
@@ -63,7 +80,7 @@ export default function Dashboard() {
   return (
     <>
       <Head title="Dashboard" />
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex min-h-screen bg-white">
         <Sidebar
           activeTab={activeTab}
           setActiveTab={setActiveTab}
@@ -79,7 +96,7 @@ export default function Dashboard() {
             sidebarOpen ? 'md:ml-64' : 'ml-0'
           )}
         >
-          <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-white px-4 sm:px-6">
+          <header>
             <Button
               variant="ghost"
               size="icon"
@@ -88,19 +105,9 @@ export default function Dashboard() {
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <div className="flex-1">
-              <h1 className="text-lg font-semibold">Dashboard</h1>
-            </div>
-            {!isPremium && (
-              <div className="flex items-center gap-4">
-                <Button size="sm" variant="default">
-                  Fazer upgrade
-                </Button>
-              </div>
-            )}
           </header>
 
-          <main className="flex-1 p-4 sm:p-6">{renderContent()}</main>
+          <main className="flex-1 p-4 sm:p-8 bg-white">{renderContent()}</main>
         </div>
       </div>
     </>

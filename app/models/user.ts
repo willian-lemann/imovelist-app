@@ -22,6 +22,18 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column({ serializeAs: null })
   declare password: string
 
+  @column()
+  declare profilePhoto: string | null
+
+  @column()
+  declare whatsapp: string | null
+
+  @column()
+  declare profileUrl: string | null
+
+  @column()
+  declare logo: string | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

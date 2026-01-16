@@ -18,8 +18,8 @@ _Antes de iniciar, utilize estes valores:_
 - **Nome do App:** [NOME_DO_SEU_APP]
 - **Moeda:** [BRL ou USD]
 - **Planos Desejados:**
-  1. Nome: **[NOME_PLANO_1]** | Valor: **[VALOR_1]** (Intervalo: Mensal)
-  2. Nome: **[NOME_PLANO_2]** | Valor: **[VALOR_2]** (Intervalo: Mensal)
+  1. Nome: **[Starter]** | Valor: **[47,00]** (Intervalo: Mensal) em reais
+  2. Nome: **[Profissional]** | Valor: **[97,00]** (Intervalo: Mensal) em reais
 - **URL do Webhook (Produção ou Dev/Ngrok):** `[SUA_URL]/api/webhooks/stripe`
 
 ---
