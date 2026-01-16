@@ -102,7 +102,7 @@ Não perca esta oportunidade única! Agende sua visita hoje mesmo e conheça pes
           </Badge>
         </div>
 
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-6">
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-6">
           <div className="flex items-start gap-4">
             <div className="rounded-full bg-amber-100 p-3">
               <Lock className="h-6 w-6 text-amber-600" />
@@ -145,7 +145,7 @@ Não perca esta oportunidade única! Agende sua visita hoje mesmo e conheça pes
               <CardTitle>Prévia da Página</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+              <div className="h-64 bg-gray-100 rounded-xl flex items-center justify-center">
                 <Sparkles className="h-12 w-12 text-gray-300" />
               </div>
             </CardContent>
@@ -190,7 +190,7 @@ Não perca esta oportunidade única! Agende sua visita hoje mesmo e conheça pes
             )}
 
             {selectedListing && (
-              <div className="rounded-lg border bg-gray-50 p-4 space-y-2">
+              <div className="rounded-xl border bg-gray-50 p-4 space-y-2">
                 <h4 className="font-medium">{selectedListing.name}</h4>
                 <p className="text-sm text-gray-600">{selectedListing.address}</p>
                 <div className="flex gap-2 flex-wrap">
@@ -257,7 +257,7 @@ Não perca esta oportunidade única! Agende sua visita hoje mesmo e conheça pes
                 className="min-h-[400px] font-mono text-sm"
               />
             ) : (
-              <div className="min-h-[400px] bg-gray-50 rounded-lg flex flex-col items-center justify-center text-gray-400">
+              <div className="min-h-[400px] bg-gray-50 rounded-xl flex flex-col items-center justify-center text-gray-400">
                 <Sparkles className="h-12 w-12 mb-4" />
                 <p className="text-center">
                   Selecione um imóvel e clique em

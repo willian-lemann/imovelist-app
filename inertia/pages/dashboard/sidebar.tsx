@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   LayoutDashboard,
   PlusCircle,
+  BadgeCheckIcon,
 } from 'lucide-react'
 import { Link } from '@inertiajs/react'
 import { cn } from '~/lib/utils'
@@ -123,7 +124,7 @@ export function Sidebar({
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
                 className={cn(
-                  'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                  'flex w-full items-center gap-3 rounded-xl px-3 py-3.5 text-sm font-medium transition-colors',
                   isActive ? 'bg-primary/10 text-primary' : 'text-gray-600 hover:bg-gray-100'
                 )}
               >
@@ -145,7 +146,7 @@ export function Sidebar({
                 onClick={() => !isLocked && setActiveTab(item.id)}
                 disabled={isLocked}
                 className={cn(
-                  'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                  'flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors',
                   isActive ? 'bg-primary/10 text-primary' : 'text-gray-600 hover:bg-gray-100',
                   isLocked && 'cursor-not-allowed opacity-60'
                 )}
@@ -153,15 +154,7 @@ export function Sidebar({
                 <item.icon className={cn('h-5 w-5', isActive && 'text-primary')} />
                 <span className="flex-1 text-left">{item.label}</span>
                 {item.premium && (
-                  <Badge
-                    variant="outline"
-                    className={cn(
-                      'text-xs',
-                      isPremium
-                        ? 'border-green-200 bg-green-50 text-green-700'
-                        : 'border-amber-200 bg-amber-50 text-amber-700'
-                    )}
-                  >
+                  <Badge variant="secondary" className="bg-primary text-white hover:bg-primary">
                     {isPremium ? 'Ativo' : 'Premium'}
                   </Badge>
                 )}
@@ -174,7 +167,7 @@ export function Sidebar({
         <div className="border-t p-4">
           {/* Premium upgrade banner */}
           {!isPremium && (
-            <div className="mb-4 rounded-lg bg-linear-to-r from-primary to-cyan-500 p-4 text-white">
+            <div className="mb-4 rounded-xl bg-linear-to-r from-primary to-cyan-500 p-4 text-white">
               <div className="flex items-center gap-2">
                 <Stars className="h-5 w-5" />
                 <span className="text-sm font-semibold">Upgrade</span>
@@ -193,7 +186,7 @@ export function Sidebar({
           <Link
             href="/logout"
             method="post"
-            className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
           >
             <LogOut className="h-4 w-4" />
             Sair

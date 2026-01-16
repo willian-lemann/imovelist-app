@@ -13,11 +13,11 @@ export function Header() {
       <div className="mx-auto max-w-[1350px] py-4 flex items-center justify-between px-4 md:px-0">
         <Logo />
 
-        <div className="flex items-center gap-4">
+        {/* <div className="flex items-center gap-4">
           {isLogged ? (
             <>
               <Link href="/dashboard">
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="gap-2 gradient">
                   <LayoutDashboard className="h-4 w-4" />
                   Dashboard
                 </Button>
@@ -36,7 +36,7 @@ export function Header() {
               </Button>
             </LoginModal>
           )}
-        </div>
+        </div> */}
       </div>
     </header>
   )

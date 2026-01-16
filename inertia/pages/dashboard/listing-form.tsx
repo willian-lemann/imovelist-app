@@ -287,7 +287,7 @@ export function ListingForm({ listingId, onCancel, onSuccess }: ListingFormProps
             <CardDescription>Gerencie as fotos do imóvel</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+            <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
               <p className="text-sm text-blue-800">
                 {isEditing ? (
                   <>

@@ -163,4 +163,13 @@ button {
       scrollbar-width: none;
       /* Firefox */
    }
+
+   .gradient {
+      background: linear-gradient(to right, var(--color-primary), var(--primary), #8334ea8a);
+      color: white;
+   }
+
+   .gradient:hover {
+      color: white;
+   }
 }

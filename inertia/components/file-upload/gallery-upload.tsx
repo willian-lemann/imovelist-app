@@ -66,7 +66,7 @@ export default function GalleryUpload({
       {/* Upload Area */}
       <div
         className={cn(
-          'relative w-full rounded-lg border border-dashed p-8 text-center transition-colors',
+          'relative w-full rounded-xl border border-dashed p-8 text-center transition-colors',
           isDragging
             ? 'border-primary bg-primary/5'
             : 'border-muted-foreground/25 hover:border-muted-foreground/50'
@@ -132,15 +132,15 @@ export default function GalleryUpload({
                 <img
                   src={fileItem.preview}
                   alt={fileItem.file.name}
-                  className="h-full w-full rounded-lg border object-cover transition-transform group-hover:scale-105"
+                  className="h-full w-full rounded-xl border object-cover transition-transform group-hover:scale-105"
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center rounded-lg border bg-muted">
+                <div className="flex h-full w-full items-center justify-center rounded-xl border bg-muted">
                   <ImageIcon className="h-8 w-8 text-muted-foreground" />
                 </div>
               )}
 
-              <div className="absolute inset-0 flex items-center justify-center gap-2 rounded-lg bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+              <div className="absolute inset-0 flex items-center justify-center gap-2 rounded-xl bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
                 {fileItem.preview && (
                   <Button
                     onClick={() => setSelectedImage(fileItem.preview!)}
@@ -201,7 +201,7 @@ export default function GalleryUpload({
             <img
               src={selectedImage}
               alt="Preview"
-              className="max-h-full max-w-full rounded-lg object-contain"
+              className="max-h-full max-w-full rounded-xl object-contain"
               onClick={(e) => e.stopPropagation()}
             />
             <Button

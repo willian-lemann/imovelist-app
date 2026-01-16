@@ -40,7 +40,7 @@ export function Search() {
   return (
     <>
       {renderFloatingSearch()}
-      <div className="transition-all flex md:flex-row flex-col md:items-center justify-end px-0  w-full max-w-full gap-2 bg-background rounded-lg ">
+      <div className="transition-all flex md:flex-row flex-col md:items-center justify-end px-0  w-full max-w-full gap-2 bg-background rounded-xl ">
         <SearchContent />
       </div>
     </>

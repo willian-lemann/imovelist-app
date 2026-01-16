@@ -41,7 +41,7 @@ export function PhotosCarousel({ photos, showDots }: PhotosCarouselProps) {
         {photos.map((photo) => {
           return (
             <CarouselItem key={photo}>
-              <div className="w-36 md:w-auto h-32 md:h-[180px] brightness-100 transition-all duration-300 md:rounded-lg overflow-hidden">
+              <div className="w-36 md:w-auto h-32 md:h-[180px] brightness-100 transition-all duration-300 md:rounded-xl overflow-hidden">
                 <PhotoCarouselItem href={photo} blurImage={photo} isFirst={current === 1} />
               </div>
             </CarouselItem>
@@ -49,7 +49,7 @@ export function PhotosCarousel({ photos, showDots }: PhotosCarouselProps) {
         })}
       </CarouselContent>
       {showDots && (
-        <div className="bg-foreground rounded-lg px-2 flex items-center py-1 z-9999 absolute bottom-10 right-4">
+        <div className="bg-foreground rounded-xl px-2 flex items-center py-1 z-9999 absolute bottom-10 right-4">
           {photos.length > 1 && (
             <span className="text-xs text-white">
               {current} de {count > 0 ? count : 1}

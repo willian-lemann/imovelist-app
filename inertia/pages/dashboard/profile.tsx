@@ -87,7 +87,7 @@ export function Profile({ user }: ProfileProps) {
         {/* Main Content - Left Side */}
         <div className="space-y-6 lg:col-span-2">
           {/* Profile Photo & Basic Info */}
-          <Card className="border-gray-100 shadow-sm">
+          <Card className="border-gray-100 shadow-md">
             <CardContent className="p-6">
               <div className="flex flex-col items-start gap-6 sm:flex-row">
                 {/* Profile Photo */}
@@ -112,7 +112,7 @@ export function Profile({ user }: ProfileProps) {
                       className="hidden"
                       onChange={handlePhotoChange}
                     />
-                    <span className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+                    <span className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
                       <Camera className="h-4 w-4" />
                       Trocar Foto
                     </span>
@@ -154,7 +154,7 @@ export function Profile({ user }: ProfileProps) {
           </Card>
 
           {/* Digital Identity */}
-          <Card className="border-gray-100 shadow-sm">
+          <Card className="border-gray-100 shadow-md">
             <CardContent className="p-6">
               <div className="mb-4 flex items-center gap-2">
                 <Globe className="h-5 w-5 text-primary" />
@@ -166,7 +166,7 @@ export function Profile({ user }: ProfileProps) {
 
               <div className="space-y-2">
                 <Label htmlFor="profileUrl">URL do Perfil (Único)</Label>
-                <div className="flex overflow-hidden rounded-lg border border-gray-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+                <div className="flex overflow-hidden rounded-xl border border-gray-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
                   <span className="flex items-center bg-gray-50 px-4 text-sm text-gray-500">
                     imovelist.com/agent/
                   </span>
@@ -192,7 +192,7 @@ export function Profile({ user }: ProfileProps) {
           </Card>
 
           {/* Portfolio Design */}
-          <Card className="border-gray-100 shadow-sm">
+          <Card className="border-gray-100 shadow-md">
             <CardContent className="p-6">
               <div className="mb-4 flex items-center gap-2">
                 <Palette className="h-5 w-5 text-primary" />
@@ -205,12 +205,12 @@ export function Profile({ user }: ProfileProps) {
               <div className="space-y-4">
                 <Label>Logo da Imobiliária/Sua Logo</Label>
                 <div className="flex items-center gap-4">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-gray-100">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-gray-100">
                     {logo ? (
                       <img
                         src={logo}
                         alt="Logo"
-                        className="h-full w-full rounded-lg object-cover"
+                        className="h-full w-full rounded-xl object-cover"
                       />
                     ) : (
                       <Image className="h-8 w-8 text-gray-300" />
@@ -223,7 +223,7 @@ export function Profile({ user }: ProfileProps) {
                       className="hidden"
                       onChange={handleLogoChange}
                     />
-                    <span className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+                    <span className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
                       <Camera className="h-4 w-4" />
                       Trocar Logo
                     </span>
@@ -249,7 +249,7 @@ export function Profile({ user }: ProfileProps) {
                     Ao Vivo
                   </span>
                 </div>
-                <div className="overflow-hidden rounded-lg border border-gray-200 bg-linear-to-b from-gray-800 to-gray-900">
+                <div className="overflow-hidden rounded-xl border border-gray-200 bg-linear-to-b from-gray-800 to-gray-900">
                   <div className="p-6 text-center text-white">
                     <h4 className="text-lg font-semibold">{data.fullName || 'Seu Nome'}</h4>
                     <p className="mt-1 text-sm text-gray-400">
@@ -259,7 +259,7 @@ export function Profile({ user }: ProfileProps) {
                   </div>
                   <div className="bg-white p-4">
                     <div className="flex items-center gap-3">
-                      <div className="h-12 w-12 overflow-hidden rounded-lg bg-gray-100">
+                      <div className="h-12 w-12 overflow-hidden rounded-xl bg-gray-100">
                         {profilePhoto ? (
                           <img src={profilePhoto} alt="" className="h-full w-full object-cover" />
                         ) : (
@@ -305,7 +305,7 @@ export function Profile({ user }: ProfileProps) {
         {/* Right Sidebar */}
         <div className="space-y-6">
           {/* QR Code Card */}
-          <Card className="border-gray-100 shadow-sm">
+          <Card className="border-gray-100 shadow-md">
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Cartão de Visitas Digital</CardTitle>
             </CardHeader>
@@ -320,10 +320,10 @@ export function Profile({ user }: ProfileProps) {
           </Card>
 
           {/* Instagram Business Card */}
-          <Card className="border-gray-100 shadow-sm">
+          <Card className="border-gray-100 shadow-md">
             <CardContent className="p-6">
               <div className="mb-3 flex items-center gap-2">
-                <div className="rounded-lg bg-linear-to-br from-purple-500 via-pink-500 to-orange-500 p-2">
+                <div className="rounded-xl bg-linear-to-br from-purple-500 via-pink-500 to-orange-500 p-2">
                   <Instagram className="h-5 w-5 text-white" />
                 </div>
                 <h3 className="font-semibold text-gray-900">Instagram Business</h3>
@@ -349,9 +349,9 @@ export function Profile({ user }: ProfileProps) {
           </Card>
 
           {/* Boost Sales Card */}
-          <Card className="border-0 bg-linear-to-r from-primary to-cyan-500 text-white shadow-sm">
+          <Card className="border-0 bg-linear-to-r from-primary to-cyan-500 text-white shadow-md">
             <CardContent className="p-6">
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-white/20">
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-white/20">
                 <Star className="h-5 w-5" />
               </div>
               <h3 className="font-semibold">Impulsione suas Vendas</h3>

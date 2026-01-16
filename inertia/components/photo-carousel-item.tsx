@@ -14,7 +14,7 @@ export function PhotoCarouselItem({ href, blurImage }: PhotoCarouselItemProps) {
 
   if (hasError) {
     return (
-      <div className="object-cover md:rounded-lg flex items-center justify-center h-full w-full bg-secondary">
+      <div className="object-cover md:rounded-xl flex items-center justify-center h-full w-full bg-secondary">
         <ImageOff />
       </div>
     )
@@ -39,7 +39,7 @@ export function PhotoCarouselItem({ href, blurImage }: PhotoCarouselItemProps) {
       <img
         src={imageSrc}
         alt="Property Image"
-        className={cn('object-cover rounded-lg h-full w-full', {
+        className={cn('object-cover rounded-xl h-full w-full', {
           'blur-sm': isPlaceholder,
         })}
         loading="lazy"

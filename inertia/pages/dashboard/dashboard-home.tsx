@@ -28,10 +28,7 @@ export function DashboardHome({
           </h1>
           <p className="mt-1 text-gray-500">Gerencie seus anúncios e acompanhe seu desempenho.</p>
         </div>
-        <Button
-          onClick={onCreateListing}
-          className="bg-linear-to-r from-primary to-purple-400 hover:from-primary/90 hover:to-purple-400/90"
-        >
+        <Button onClick={onCreateListing} className="gradient">
           <Plus className="mr-2 h-4 w-4" />
           Novo Anúncio
         </Button>
@@ -47,7 +44,7 @@ export function DashboardHome({
                 <p className="text-sm font-medium text-gray-500">Anúncios Gerados</p>
                 <p className="mt-2 text-3xl font-bold text-gray-900">{listingsCount}</p>
               </div>
-              <div className="rounded-lg bg-primary/10 p-2">
+              <div className="rounded-xl bg-primary/10 p-2">
                 <FileText className="h-5 w-5 text-primary" />
               </div>
             </div>
@@ -62,7 +59,7 @@ export function DashboardHome({
                 <p className="text-sm font-medium text-gray-500">Plano</p>
                 <p className="mt-2 text-2xl font-bold text-gray-900">{plan}</p>
               </div>
-              <div className="rounded-lg bg-primary/10 p-2">
+              <div className="rounded-xl bg-primary/10 p-2">
                 <Zap className="h-5 w-5 text-primary" />
               </div>
             </div>
@@ -74,7 +71,7 @@ export function DashboardHome({
           <Card className="border-0 bg-linear-to-r from-primary to-cyan-500 text-white shadow-sm">
             <CardContent className="p-6">
               <div className="flex items-start gap-3">
-                <div className="rounded-lg bg-white/20 p-2">
+                <div className="rounded-xl bg-white/20 p-2">
                   <Stars className="h-5 w-5" />
                 </div>
                 <div className="flex-1">
@@ -123,7 +120,7 @@ export function DashboardHome({
         <h2 className="mb-4 text-lg font-semibold text-gray-900">Anúncios Recentes</h2>
         <Card className="border-gray-100 shadow-sm">
           <CardContent className="flex flex-col items-center justify-center py-16">
-            <div className="mb-4 rounded-lg bg-gray-100 p-4">
+            <div className="mb-4 rounded-xl bg-gray-100 p-4">
               <File className="h-10 w-10 text-gray-400" />
             </div>
             <p className="mb-6 text-gray-500">Você ainda não gerou nenhum anúncio.</p>

@@ -1,7 +1,7 @@
-import * as React from 'react';
-import { cn } from '@/lib/utils';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { X } from 'lucide-react';
+import * as React from 'react'
+import { cn } from '@/lib/utils'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { X } from 'lucide-react'
 
 const alertVariants = cva('flex items-stretch w-full gap-2 group-[.toaster]:w-(--width)', {
   variants: {
@@ -28,8 +28,8 @@ const alertVariants = cva('flex items-stretch w-full gap-2 group-[.toaster]:w-(-
       stroke: 'text-foreground',
     },
     size: {
-      lg: 'rounded-lg p-4 gap-3 text-base [&>[data-slot=alert-icon]>svg]:size-6 *:data-slot=alert-icon:mt-0.5 [&_[data-slot=alert-close]]:mt-1',
-      md: 'rounded-lg p-3.5 gap-2.5 text-sm [&>[data-slot=alert-icon]>svg]:size-5 *:data-slot=alert-icon:mt-0 [&_[data-slot=alert-close]]:mt-0.5',
+      lg: 'rounded-xl p-4 gap-3 text-base [&>[data-slot=alert-icon]>svg]:size-6 *:data-slot=alert-icon:mt-0.5 [&_[data-slot=alert-close]]:mt-1',
+      md: 'rounded-xl p-3.5 gap-2.5 text-sm [&>[data-slot=alert-icon]>svg]:size-5 *:data-slot=alert-icon:mt-0 [&_[data-slot=alert-close]]:mt-0.5',
       sm: 'rounded-md px-3 py-2.5 gap-2 text-xs [&>[data-slot=alert-icon]>svg]:size-4 *:data-alert-icon:mt-0.5 [&_[data-slot=alert-close]]:mt-0.25 [&_[data-slot=alert-close]_svg]:size-3.5',
     },
   },
@@ -71,24 +71,28 @@ const alertVariants = cva('flex items-stretch w-full gap-2 group-[.toaster]:w-(-
     {
       variant: 'mono',
       appearance: 'solid',
-      className: 'bg-zinc-950 text-white dark:bg-zinc-300 dark:text-black *:data-slot-[alert=close]:text-white',
+      className:
+        'bg-zinc-950 text-white dark:bg-zinc-300 dark:text-black *:data-slot-[alert=close]:text-white',
     },
 
     /* Outline */
     {
       variant: 'secondary',
       appearance: 'outline',
-      className: 'border border-border bg-background text-foreground [&_[data-slot=alert-close]]:text-foreground',
+      className:
+        'border border-border bg-background text-foreground [&_[data-slot=alert-close]]:text-foreground',
     },
     {
       variant: 'primary',
       appearance: 'outline',
-      className: 'border border-border bg-background text-primary [&_[data-slot=alert-close]]:text-foreground',
+      className:
+        'border border-border bg-background text-primary [&_[data-slot=alert-close]]:text-foreground',
     },
     {
       variant: 'destructive',
       appearance: 'outline',
-      className: 'border border-border bg-background text-destructive [&_[data-slot=alert-close]]:text-foreground',
+      className:
+        'border border-border bg-background text-destructive [&_[data-slot=alert-close]]:text-foreground',
     },
     {
       variant: 'success',
@@ -111,7 +115,8 @@ const alertVariants = cva('flex items-stretch w-full gap-2 group-[.toaster]:w-(-
     {
       variant: 'mono',
       appearance: 'outline',
-      className: 'border border-border bg-background text-foreground [&_[data-slot=alert-close]]:text-foreground',
+      className:
+        'border border-border bg-background text-foreground [&_[data-slot=alert-close]]:text-foreground',
     },
 
     /* Light */
@@ -160,12 +165,14 @@ const alertVariants = cva('flex items-stretch w-full gap-2 group-[.toaster]:w-(-
     {
       variant: 'mono',
       icon: 'warning',
-      className: '[&_[data-slot=alert-icon]]:text-[var(--color-warning-foreground,var(--color-yellow-600))]',
+      className:
+        '[&_[data-slot=alert-icon]]:text-[var(--color-warning-foreground,var(--color-yellow-600))]',
     },
     {
       variant: 'mono',
       icon: 'success',
-      className: '[&_[data-slot=alert-icon]]:text-[var(--color-success-foreground,var(--color-green-600))]',
+      className:
+        '[&_[data-slot=alert-icon]]:text-[var(--color-success-foreground,var(--color-green-600))]',
     },
     {
       variant: 'mono',
@@ -175,7 +182,8 @@ const alertVariants = cva('flex items-stretch w-full gap-2 group-[.toaster]:w-(-
     {
       variant: 'mono',
       icon: 'info',
-      className: '[&_[data-slot=alert-icon]]:text-[var(--color-info-foreground,var(--color-violet-600))]',
+      className:
+        '[&_[data-slot=alert-icon]]:text-[var(--color-info-foreground,var(--color-violet-600))]',
     },
   ],
   defaultVariants: {
@@ -183,16 +191,30 @@ const alertVariants = cva('flex items-stretch w-full gap-2 group-[.toaster]:w-(-
     appearance: 'solid',
     size: 'md',
   },
-});
+})
 
-interface AlertProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof alertVariants> {
-  close?: boolean;
-  onClose?: () => void;
+interface AlertProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof alertVariants> {
+  close?: boolean
+  onClose?: () => void
 }
 
-interface AlertIconProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof alertVariants> {}
+interface AlertIconProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof alertVariants> {}
 
-function Alert({ className, variant, size, icon, appearance, close = false, onClose, children, ...props }: AlertProps) {
+function Alert({
+  className,
+  variant,
+  size,
+  icon,
+  appearance,
+  close = false,
+  onClose,
+  children,
+  ...props
+}: AlertProps) {
   return (
     <div
       data-slot="alert"
@@ -212,11 +234,11 @@ function Alert({ className, variant, size, icon, appearance, close = false, onCl
         </button>
       )}
     </div>
-  );
+  )
 }
 
 function AlertTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
-  return <div data-slot="alert-title" className={cn('grow tracking-tight', className)} {...props} />;
+  return <div data-slot="alert-title" className={cn('grow tracking-tight', className)} {...props} />
 }
 
 function AlertIcon({ children, className, ...props }: AlertIconProps) {
@@ -224,7 +246,7 @@ function AlertIcon({ children, className, ...props }: AlertIconProps) {
     <div data-slot="alert-icon" className={cn('shrink-0', className)} {...props}>
       {children}
     </div>
-  );
+  )
 }
 
 function AlertToolbar({ children, className, ...props }: AlertIconProps) {
@@ -232,7 +254,7 @@ function AlertToolbar({ children, className, ...props }: AlertIconProps) {
     <div data-slot="alert-toolbar" className={cn(className)} {...props}>
       {children}
     </div>
-  );
+  )
 }
 
 function AlertDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
@@ -242,7 +264,7 @@ function AlertDescription({ className, ...props }: React.HTMLAttributes<HTMLPara
       className={cn('text-sm [&_p]:leading-relaxed [&_p]:mb-2', className)}
       {...props}
     />
-  );
+  )
 }
 
 function AlertContent({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
@@ -252,7 +274,7 @@ function AlertContent({ className, ...props }: React.HTMLAttributes<HTMLParagrap
       className={cn('space-y-2 [&_[data-slot=alert-title]]:font-semibold', className)}
       {...props}
     />
-  );
+  )
 }
 
-export { Alert, AlertContent, AlertDescription, AlertIcon, AlertTitle, AlertToolbar };
+export { Alert, AlertContent, AlertDescription, AlertIcon, AlertTitle, AlertToolbar }

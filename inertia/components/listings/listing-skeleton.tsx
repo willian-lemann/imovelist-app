@@ -5,7 +5,7 @@ export function ListingItemSkeleton() {
     <div className="w-full max-w-md animate-pulse">
       {/* Image skeleton */}
       <div className="relative">
-        <Skeleton className="w-36 md:w-full h-32 md:h-[180px] rounded-lg" />
+        <Skeleton className="w-36 md:w-full h-32 md:h-[180px] rounded-xl" />
         {/* Badge skeleton */}
         <Skeleton className="absolute top-3 left-3 h-6 w-16 rounded-full" />
       </div>

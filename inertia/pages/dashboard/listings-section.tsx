@@ -58,7 +58,7 @@ export function ListingsSection({ onEdit, onCreateNew }: ListingsSectionProps) {
 
   if (error) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+      <div className="rounded-xl border border-red-200 bg-red-50 p-4">
         <p className="text-red-800">Erro ao carregar anúncios. Tente novamente.</p>
       </div>
     )

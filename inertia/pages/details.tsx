@@ -93,7 +93,7 @@ export default function Details({ listing }: ListingDetailsProps) {
             <div className="hidden md:flex max-h-[420px] gap-2">
               <img
                 src={listing.photos![0]}
-                className="object-cover h-auto rounded-lg cursor-pointer w-[55%]"
+                className="object-cover h-auto rounded-xl cursor-pointer w-[55%]"
                 alt="Imagem da propriedade principal"
               />
 
@@ -103,7 +103,7 @@ export default function Details({ listing }: ListingDetailsProps) {
                     <img
                       key={photo}
                       src={photo}
-                      className="object-cover w-full h-full rounded-lg"
+                      className="object-cover w-full h-full rounded-xl"
                       alt={`Imagem do imovel ${listing.id}`}
                     />
                   ))}

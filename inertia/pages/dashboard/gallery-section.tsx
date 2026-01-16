@@ -115,7 +115,7 @@ export function GallerySection({ isPremium = false }: GallerySectionProps) {
           </Badge>
         </div>
 
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-6">
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-6">
           <div className="flex items-start gap-4">
             <div className="rounded-full bg-amber-100 p-3">
               <Lock className="h-6 w-6 text-amber-600" />
@@ -157,7 +157,7 @@ export function GallerySection({ isPremium = false }: GallerySectionProps) {
               {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center"
+                  className="aspect-square bg-gray-100 rounded-xl flex items-center justify-center"
                 >
                   <Images className="h-8 w-8 text-gray-300" />
                 </div>
@@ -216,7 +216,7 @@ export function GallerySection({ isPremium = false }: GallerySectionProps) {
             {isLoadingGallery ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {[1, 2, 3, 4].map((i) => (
-                  <Skeleton key={i} className="aspect-square w-full rounded-lg" />
+                  <Skeleton key={i} className="aspect-square w-full rounded-xl" />
                 ))}
               </div>
             ) : galleryPhotos.length > 0 ? (
@@ -231,7 +231,7 @@ export function GallerySection({ isPremium = false }: GallerySectionProps) {
                     <img
                       src={photo.url}
                       alt={`Foto ${photo.order + 1}`}
-                      className="aspect-square w-full object-cover rounded-lg"
+                      className="aspect-square w-full object-cover rounded-xl"
                     />
                     <button
                       onClick={() => handleDeletePhoto(photo)}

@@ -4,7 +4,7 @@ import {
   DialogContent,
   DialogClose,
   DialogTitle,
-} from "../components/ui/dialog";
+} from '../components/ui/dialog'
 import {
   Carousel,
   CarouselContent,
@@ -12,29 +12,29 @@ import {
   CarouselNext,
   CarouselPrevious,
   type CarouselApi,
-} from "../components/ui/carousel";
-import { XIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+} from '../components/ui/carousel'
+import { XIcon } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 export function Gallery({ photos }: { photos: string[] }) {
-  const [api, setApi] = useState<CarouselApi>();
-  const [current, setCurrent] = useState(0);
+  const [api, setApi] = useState<CarouselApi>()
+  const [current, setCurrent] = useState(0)
 
   useEffect(() => {
     if (!api) {
-      return;
+      return
     }
 
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap());
-    });
-  }, [api]);
+    api.on('select', () => {
+      setCurrent(api.selectedScrollSnap())
+    })
+  }, [api])
 
   useEffect(() => {
     if (api) {
-      api.scrollTo(current);
+      api.scrollTo(current)
     }
-  }, [api, current]);
+  }, [api, current])
 
   return (
     <section id="gallery" className="container px-4 md:px-8">
@@ -43,18 +43,18 @@ export function Gallery({ photos }: { photos: string[] }) {
         {photos.map((photo) => (
           <div
             key={photo}
-            className="relative aspect-square rounded-lg overflow-hidden cursor-pointer"
+            className="relative aspect-square rounded-xl overflow-hidden cursor-pointer"
           >
             <Dialog>
               <DialogTrigger
                 onClick={() => {
-                  setCurrent(photos.indexOf(photo));
+                  setCurrent(photos.indexOf(photo))
                 }}
                 asChild
               >
                 <img
                   src={photo}
-                  className="object-cover rounded-lg w-full h-full"
+                  className="object-cover rounded-xl w-full h-full"
                   alt={`Imagem do apartamento ${photo}`}
                 />
               </DialogTrigger>
@@ -76,7 +76,7 @@ export function Gallery({ photos }: { photos: string[] }) {
                       <CarouselItem key={carouselPhoto}>
                         <img
                           src={carouselPhoto}
-                          className="object-cover w-full h-[400px] md:h-[600px] rounded-lg "
+                          className="object-cover w-full h-[400px] md:h-[600px] rounded-xl "
                           alt={`Imagem do apartamento ${carouselPhoto}`}
                         />
                       </CarouselItem>
@@ -90,5 +90,5 @@ export function Gallery({ photos }: { photos: string[] }) {
         ))}
       </div>
     </section>
-  );
+  )
 }
